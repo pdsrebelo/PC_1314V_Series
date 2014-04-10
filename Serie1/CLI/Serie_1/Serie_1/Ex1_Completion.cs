@@ -37,22 +37,21 @@ namespace Serie_1
         {
             lock (this)
             {
+                if (_signaled)      // Signaled to please all
+                    return true;
+
+                if (timeout == 0)   // Timeout
+                    return false;
+
+                if (_permits >= 1)  // Verify if there are enough permits to "Acquire"
+                {
+                    _permits--;
+                    return true;
+                }
+
+                int initialTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
                 do
                 {
-                    if (_signaled)      // Signaled to please all
-                        return true;
-
-                    if (timeout == 0)   // Timeout
-                        return false;
-
-                    int initialTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
-
-                    if (_permits >= 1)  // Verify if there are enough permits to "Acquire"
-                    {
-                        _permits--;
-                        return true;
-                    }
-
                     try  // Wait for more permits...
                     {
                         Monitor.Wait(this, timeout);
@@ -65,12 +64,15 @@ namespace Serie_1
                         throw;  // Rethrow the exception
                     }
 
+                    if (_signaled || _permits >= 1)  // Verify if there are enough permits to "Acquire" or if it's Signaled to please all
+                    {
+                        _permits--;
+                        return true;
+                    }
+
                     timeout = SyncUtils.AdjustTimeout(ref initialTime, ref timeout); // Update the time
 
-                    if (timeout == 0)
-                        return false;
-
-                } while (true);
+                } while (timeout>0);
             }
             
         }
@@ -80,9 +82,12 @@ namespace Serie_1
         {
             lock (this)
             {
-                // If "signaled" then we don't need to count the permits - We notify all the threads!
-                if(_signaled)
-                    Monitor.PulseAll(this);
+//                // If "signaled" then we don't need to count the permits - We notify all the threads!
+//                if (_signaled)
+//                {
+//                    Monitor.PulseAll(this);
+//                    return;
+//                }
 
                 // A Task was concluded, so we have another permit available!
                 _permits++;
