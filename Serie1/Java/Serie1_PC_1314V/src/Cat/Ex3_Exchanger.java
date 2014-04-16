@@ -1,5 +1,7 @@
 package Cat;
 
+import java.util.LinkedList;
+
 public class Ex3_Exchanger<T> {
 
 	/*
@@ -13,11 +15,54 @@ public class Ex3_Exchanger<T> {
 		interrompida, expire o limite de tempo especificado através do parâmetro timeout, ou até que outra 
 		thread invoque o método exchange. 
 	 */
-
-	public T exchange(T myMsg, long timeout){
+	
+	public class Message<T>{
+		protected T msg;
+		protected boolean consumed;
 		
-		return null;	
+		public Message(T m){
+			msg = m;
+			consumed = false;
+		}
 	}
+	private LinkedList<Message<T>> messages; // Cada posição tem a mensagem e o número da thread
 	
-	
+	// é chamado pelas threads para oferecer uma mensagem (myMsg) e receber uma mensagem oferecida (retorno)
+	// pela thread com que emparelham
+	public synchronized T exchange(T myMsg, long timeout) throws InterruptedException{
+
+		T receivedMsg = null;
+		
+		if(!messages.isEmpty()){
+			receivedMsg = messages.getFirst().msg;
+			messages.getFirst().msg = myMsg;
+			messages.getFirst().consumed = true;
+			this.notifyAll();
+			return receivedMsg;
+		}
+		
+		Message<T> offeredMsg = new Message<T>(myMsg);
+		do{
+			if(messages.isEmpty()){ // Adicionar esta mensagem à lista
+				messages.add(offeredMsg);
+			}
+			try{
+				this.notify();	// Notificar - Para que haja thread p/emparelhar
+				this.wait();
+			}catch(InterruptedException iex){
+				messages.remove();
+				throw iex;
+			}
+			
+			// Wait for another message to be offered for consumption 
+			if(offeredMsg.consumed){
+				T msg = offeredMsg.msg;
+				messages.remove(offeredMsg);
+				return msg; // Mensagem substituída! agora "msg" é a mensagem oferecida pela outra thread!
+			}
+			if(timeout==0){
+				//timeout= SyncUtils.;
+			}
+		}while(true);
+	}
 }

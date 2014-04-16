@@ -14,24 +14,50 @@ import java.util.LinkedList;
 	satisfeitos os pedidos das threads bloqueadas há mais tempo. 
 
  */
-public class Ex2_SynchronousQueue <T> {
 
+	/***
+	 * Classe auxiliar
+	 * 
+	 * protected T object;	// Objecto oferecido, para ser consumido por uma Thread.
+	 * protected boolean consumed; // Indica se o objecto (do tipo T) foi consumido por uma Thread.
+	 * 
+	 * @author Cátia
+	 *
+	 * @param <T>
+	 */
+	public class Ex2_SynchronousQueue <T> {
+
+		public class ObjectProduced{
+			protected T object;
+			protected boolean consumed;
+			
+			public ObjectProduced(T obj){
+				object = obj;
+				consumed = false;
+			}
+	}
+	
 	// FIFO Queues:
-	private LinkedList<T> consumerThreads;
-	private LinkedList<T> objectsProduced;
+	private LinkedList<Integer> consumerThreads;		// Queue FIFO de thread ID's que pretendem consumir objectos
+	private LinkedList<ObjectProduced> objectsProduced;	// Queue FIFO com os objectos a consumir
 	
 	public Ex2_SynchronousQueue(){
-		objectsProduced = new LinkedList<T>();
-		consumerThreads = new LinkedList<T>();
+		objectsProduced = new LinkedList<ObjectProduced>();
+		consumerThreads = new LinkedList<Integer>();
 	}
 	
 	// As threads consumidoras declaram disponibilidade 
 	// para receber um objeto invocando a operação take, bloqueando-se até que o objeto seja recebido por 
 	// uma thread consumidora.
 	public synchronized T take() throws InterruptedException{
+		
 		T takenObject = null;
-		T tId = (T) Thread.currentThread();//.getId();
+		int tId = (int) Thread.currentThread().getId();
 		consumerThreads.add(tId);
+		
+		if(!objectsProduced.isEmpty() && consumerThreads.getFirst().equals(tId)){	
+			return objectsProduced.getFirst().object;
+		}
 		
 		do{
 			if(objectsProduced.isEmpty()){
@@ -44,14 +70,12 @@ public class Ex2_SynchronousQueue <T> {
 					throw e;
 				}
 			}			
-			if(!objectsProduced.isEmpty()){
-				if(consumerThreads.getFirst().equals(tId))
-				{
-					consumerThreads.removeFirst();
-					takenObject = objectsProduced.removeFirst();
-					this.notifyAll();
-					break;
-				}
+			if(!objectsProduced.isEmpty() && consumerThreads.getFirst().equals(tId)){
+				consumerThreads.removeFirst();
+				takenObject = objectsProduced.getFirst().object;
+				objectsProduced.getFirst().consumed = true;
+				this.notifyAll();
+				break;
 			}
 		}while(true);
 		
@@ -61,7 +85,7 @@ public class Ex2_SynchronousQueue <T> {
 	// A operação put oferece um objeto e bloqueia a thread produtora até que exista uma 
 	// thread consumidora disponível para o receber.
 	public synchronized void put(T obj) throws InterruptedException{
-		objectsProduced.add(obj);
+		objectsProduced.add(new ObjectProduced(obj));
 		do{
 			if(consumerThreads.isEmpty()){
 				try{
