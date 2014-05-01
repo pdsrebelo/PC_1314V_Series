@@ -16,12 +16,32 @@ namespace Serie_1.Pedro
     /// todos os relatórios submetidos até ao momento sejam efectivamente escritos; relatórios submetidos 
     /// posteriormente são rejeitados (i.e. chamadas a LogMessage produzem excepção).
     /// 
-    /// Note  que  a  preocupação  principal  da  solução  a  apresentar  deverá  ser  o  de  minimizar  o  custo  do 
-    /// registo de relatórios por threadscuja prioridade se admite maior que a prioridade da logger thread. 
-    /// Pretende-se,  por  isso,  que  seja  usado  um  mecanismo  de  comunicação  que  minimize  o  tempo  de 
-    /// bloqueio das threadsprodutoras, admitindo-se inclusivamente a possibilidade de ignorar relatórios.
+    /// Note que a preocupação principal da solução a apresentar deverá ser o de minimizar o custo do 
+    /// registo de relatórios por threads cuja prioridade se admite maior que a prioridade da logger thread. 
+    /// Pretende-se, por isso, que seja usado um mecanismo de comunicação que minimize o tempo de 
+    /// bloqueio das threads produtoras, admitindo-se inclusivamente a possibilidade de ignorar relatórios.
     /// </summary>
     class Ex5Logger
     {
+        public Ex5Logger ()
+        {
+            
+        }
+
+        public void LogMessage(string msg)
+        {
+            
+        }
+
+        public void Start()
+        {
+            
+        }
+
+        public void Shutdown()
+        {
+            
+        }
+
     }
 }
