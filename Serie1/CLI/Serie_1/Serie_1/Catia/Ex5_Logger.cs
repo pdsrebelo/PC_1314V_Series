@@ -27,7 +27,8 @@ namespace Serie_1.Catia
     Note que a preocupação principal da solução a apresentar deverá ser o de minimizar o custo do 
     registo de relatórios por threads cuja prioridade se admite maior que a prioridade da logger thread. 
     Pretende-se, por isso, que seja usado um mecanismo de comunicação que minimize o tempo de 
-    bloqueio das threads produtoras, admitindo-se inclusivamente a possibilidade de ignorar relatórios. 
+    bloqueio das threads produtoras, admitindo-se inclusivamente a possibilidade de ignorar relatórios. 
+
      http://www.junit.org/ 1
      http://www.nunit.org/ 2
      * 
@@ -36,7 +37,7 @@ namespace Serie_1.Catia
     {
         Thread loggerThread;
 
-        public Ex5_Logger(TextWriter writer)
+        public Ex5_Logger(/*TextWriter writer*/)
         {
 
         }

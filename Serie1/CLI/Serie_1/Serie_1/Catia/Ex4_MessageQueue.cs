@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Serie_1.Catia
 {
@@ -22,32 +20,36 @@ namespace Serie_1.Catia
     receptoras também são servidas por ordem de chegada. A operação Receive deve suportar 
     desistência por timeout e por cancelamento devido à interrupção de threads bloqueadas
      */
-    class Ex4_MessageQueue<T>
+    
+
+    class Ex4MessageQueue<T>
     {
-        class Message<T>
+        public class Message<T>
         {
             public int type;   // Tipo da mensagem: inteiro positivo
             T data;     // Dados (T)
-            bool received;
+           // bool received;
 
             public Message(int msgType, T msgData)
             {
                 type = msgType;
                 data = msgData;
-                received = false;   // Indica se a mensagem já foi recebida por uma Thread
+             //   received = false;   // Indica se a mensagem já foi recebida por uma Thread
             }
 
-            public setReceived(bool recvd){
+            /*
+            public void SetReceived(bool recvd)
+            {
                 received = recvd;
             }
+             * */
         }
 
         private LinkedList<Message<T>> messageQueue;
         private LinkedList<bool> receivers; // bool = indica se já recebeu mensagem ou não
 
-        public Ex4_MessageQueue(){ //.CTOR
+        public Ex4MessageQueue(){ //.CTOR
             messageQueue = new LinkedList<Message<T>>();
-            senders = new LinkedList<bool>();
             receivers = new LinkedList<bool>();
         }
 
@@ -60,7 +62,7 @@ namespace Serie_1.Catia
             }
         }
 
-        public Message<T> Receive(long timeout, Predicate<int> pred)
+        public Message<T> Receive(int timeout, Predicate<int> pred)
         {
             lock (this)
             {
@@ -69,12 +71,18 @@ namespace Serie_1.Catia
                 if (receivers.Count == 0 && messageQueue.Count>0) // Se não é necessário esperar pela sua vez (ñ é necessário colocar na queue)...
                 {
                     // Ver se há alguma message cujo tipo (int) satisfaça o predicado
-                    LinkedList<Message<T>>messagesCompatible = messageQueue.Where(pred(messageQueue.type)).Select();
+                    var messagesCompatible = new LinkedList<Message<T>>();
+
+                    foreach (var msg in messageQueue.Where(msg => pred(msg.type)))
+                    {
+                        messagesCompatible.AddLast(msg);
+                    }
 
                     if(messagesCompatible.Count>0){
-                        // Colocar o boolean da Message a true = para a "Sender" Thread saber que a sua msg já foi recebida
-                        ((Message<T>)messagesCompatible.First.Value).setReceived(true);
-                        receivedMsg = messagesCompatible.RemoveFirst();
+                        // Colocar o boolean da Message a true, para a "Sender" Thread saber que a sua msg já foi recebida
+                        //(messagesCompatible.First.Value).SetReceived(true);
+                        receivedMsg = messagesCompatible.First.Value;
+                        messagesCompatible.RemoveFirst();
                         return receivedMsg;
                     }
                 }
@@ -83,33 +91,35 @@ namespace Serie_1.Catia
                 LinkedListNode<bool> receiverThread = new LinkedListNode<bool>(false);
                 receivers.AddLast(receiverThread);
 
-                long lastTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
+                int lastTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
 
                 do
                 {
                     // Ver se há alguma message cujo tipo (int) satisfaça o predicado
-                    LinkedList<Message<T>>messagesCompatible = messageQueue.Where(pred(messageQueue.type)).Select();
+                    LinkedList<Message<T>>messagesCompatible = new LinkedList<Message<T>>();
+                    foreach (var msg in messageQueue.Where(msg=>pred(msg.type)))
+                    {
+                        messagesCompatible.AddLast(msg);
+                    }
 
                     if(receiverThread.Equals(receivers.First) && messagesCompatible.Count>0){
                    
                         // Colocar o boolean da Message a true = para a "Sender" Thread saber que a sua msg já foi recebida
-                        ((Message<T>)messagesCompatible.First.Value).setReceived(true);
-                        receivedMsg = messagesCompatible.RemoveFirst();
+                        //(messagesCompatible.First.Value).SetReceived(true);
+                        receivedMsg = messagesCompatible.First.Value;
+                        messagesCompatible.RemoveFirst();
                         return receivedMsg;  
                     }
-                    else{
-                        try
-                        {
-                            Monitor.Wait(this, timeout);
-                        }
-                        catch (ThreadInterruptedException iex)
-                        {
-                            receivers.Remove(receiverThread); // Tirar da lista de receivers - ñ é preciso verificar pois qd chega aqui, está garantida| na lista
-                            Monitor.PulseAll(this); // Notificar as outras threads - pois uma delas poderá ter condições para ler uma mensagem
-                        }
+                    try
+                    {
+                        Monitor.Wait(this, timeout);
                     }
-
-                    timeout = SyncUtils.AdjustTimeout(ref lastTime, timeout);
+                    catch (ThreadInterruptedException iex)
+                    {
+                        receivers.Remove(receiverThread); // Tirar da lista de receivers - ñ é preciso verificar pois qd chega aqui, está garantida| na lista
+                        Monitor.PulseAll(this); // Notificar as outras threads - pois uma delas poderá ter condições para ler uma mensagem
+                    }
+                    timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout);
                 } while (timeout > 0);
             }
             return null;
