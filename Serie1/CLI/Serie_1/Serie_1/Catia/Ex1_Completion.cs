@@ -74,7 +74,7 @@ namespace Serie_1
 
                 } while (timeout>0);
             }
-            
+            return false;
         }
 
         // sinaliza a conclusão de uma tarefa e viabiliza a execução de uma chamada ao WaitForCompletion
