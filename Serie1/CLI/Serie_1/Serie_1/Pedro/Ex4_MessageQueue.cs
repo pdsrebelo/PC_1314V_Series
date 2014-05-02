@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Serie_1.Pedro
 {
@@ -27,7 +24,7 @@ namespace Serie_1.Pedro
     /// comunicação, através de mensagens, entre threads produtoras e consumidoras. 
     /// O sincronizador deve garantir que as mensagens do mesmo tipo são entregues pela ordem de chegada
     /// e que as threads receptoras também são servidas por ordem de chegada.
-    /// Ambas as operações devem suportar desistência por timeout e cancelamento por interrupção das threads bloqueadas.
+    /// A operação Receive deve suportar desistência por timeout e cancelamento por interrupção das threads bloqueadas.
     /// </summary>
    class Ex4_MessageQueue<T>
     {
@@ -37,7 +34,7 @@ namespace Serie_1.Pedro
         /// <summary>
         /// A operação Send promove a entrega de uma mensagem; esta operação nunca bloqueia a thread invocante.
         /// </summary>
-        public void Send(Message<T> msg, int timeout) // TODO: timeout??
+        public void Send(Message<T> msg)
         {
             lock (this)
             {
@@ -55,17 +52,24 @@ namespace Serie_1.Pedro
         {
             lock (this)
             {
+                Message<T> retMsg = null;
+
                 if (_consumersQueue.Count == 0)
                 {
                     foreach (var msg in _messageQueue)
                     {
                         if (selector(msg.Type)) // Existe uma mensagem com um predicado compativel comigo
                         {
-                            Message<T> retMsg = msg; // TODO: Ou new Message<T>(msg.Type, msg.Data); ??
-                            _messageQueue.Remove(msg);
-                            return retMsg;
+                             retMsg = msg; // TODO: Ou new Message<T>(msg.Type, msg.Data); ??
+                            // We can't delete and return here because: http://www.dotnetperls.com/invalidoperationexception
                         }
                     }
+                }
+
+                if (retMsg != null)
+                {
+                    _messageQueue.Remove(retMsg);
+                    return retMsg;
                 }
 
                 if (timeout == 0) 
@@ -95,12 +99,16 @@ namespace Serie_1.Pedro
                         {
                             if (selector(msg.Type)) // Existe uma mensagem com um predicado compativel comigo (aqui não faz sentido usar PulseAll)
                             {
-                                Message<T> retMsg = msg; // TODO: Ou new Message<T>(msg.Type, msg.Data); ??
-                                _messageQueue.Remove(msg);
-                                _consumersQueue.Remove(myNode);
-                                return retMsg;
+                                retMsg = msg; // TODO: Ou new Message<T>(msg.Type, msg.Data); ??
                             }
                         }
+                    }
+
+                    if (retMsg != null)
+                    {
+                        _messageQueue.Remove(retMsg);
+                        _consumersQueue.Remove(myNode);
+                        return retMsg;
                     }
 
                     if (SyncUtils.AdjustTimeout(ref lastTime, ref timeout) == 0)

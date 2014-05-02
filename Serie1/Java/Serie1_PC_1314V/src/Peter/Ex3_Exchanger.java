@@ -32,7 +32,7 @@ public class Ex3_Exchanger<T> {
 			try{
 				this.wait(timeout);
 			}catch(InterruptedException ie){
-				if(!messageHolder.equals(myMsg)){ /* Fui interrompido, no entanto a minha mensagem já não se encontra no holder, logo retorno sucesso e regenero a interupção*/
+				if(messageHolder != myMsg){ /* Fui interrompido, no entanto a minha mensagem já não se encontra no holder, logo retorno sucesso e regenero a interupção*/
 					T retMsg = messageHolder;
 					messageHolder = null;
 					return retMsg;
@@ -40,13 +40,13 @@ public class Ex3_Exchanger<T> {
 				throw ie;
 			}
 			
-			if(!messageHolder.equals(myMsg)){ /* Não é necessário notificar nenhuma thread, pois neste ponto ninguem está bloqueado */
+			if(messageHolder != myMsg){ /* Não é necessário notificar nenhuma thread, pois neste ponto ninguem está bloqueado */
 				T retMsg = messageHolder;
 				messageHolder = null;
 				return retMsg;
 			}
 			
-			if(SyncUtils.adjustTimeout(lasttime, timeout) == 0){
+			if(Utils.SyncUtils.adjustTimeout(lasttime, timeout) == 0){
 				messageHolder = null;
 				return null;
 			}

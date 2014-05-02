@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Serie_1.Pedro
 {
@@ -21,10 +18,22 @@ namespace Serie_1.Pedro
     {
         private Thread _loggerThread;
 
+        private enum LoggerState
+        {
+            NotStarted = 0,
+            Working = 1,
+            Shutdown = 2
+        }
+
+        private TextWriter _myTw;
+        private LinkedList<string> _msgQueue;
+        private LoggerState _state;
+
         public Ex5Logger (TextWriter tw)
         {
-//            _loggerThread = new Thread();
-//            tw = File.Create(@"C:\Users\Pedro Rebelo\Desktop\Logger.txt");
+            _msgQueue = new LinkedList<string>();
+            _myTw = tw;
+            _state = LoggerState.NotStarted;
         }
 
         /// <summary>
@@ -34,7 +43,19 @@ namespace Serie_1.Pedro
         /// <param name="msg"></param>
         public void LogMessage(string msg)
         {
-            
+            lock (this)
+            {
+                if (_state == LoggerState.Shutdown)
+                {
+                    throw new Exception("Logger is shutting down and not accepting anymore messages!");
+                }
+
+                if (_state == LoggerState.NotStarted)
+                {
+                    Start();
+                }
+                _loggerThread.Start(msg);
+            }
         }
 
         /// <summary>
@@ -43,7 +64,39 @@ namespace Serie_1.Pedro
         /// </summary>
         public void Start()
         {
-            
+            _state = LoggerState.Working;
+            _loggerThread = new Thread((msg) =>
+            {
+                lock (this)
+                {
+                    LinkedListNode<string> myNode = new LinkedListNode<string>(((string) msg));
+                    _msgQueue.AddLast(myNode);
+
+                    do
+                    {
+                        try
+                        {
+                            Monitor.Wait(this);
+                        }
+                        catch (ThreadInterruptedException)
+                        {
+                            _msgQueue.Remove(myNode);
+                            throw;
+                        }
+
+                        if (_msgQueue.First == myNode)
+                        {
+                            // TODO : Comparar a thread actual com a loggerthread (priority), NOT FINISHED!
+                            if (Thread.CurrentThread.Priority < _loggerThread.Priority)
+                            {
+                                _myTw.Write(msg);
+                                Monitor.PulseAll(this);
+                            }
+                        }
+                    } while (true);
+                }
+            });
+            _loggerThread.Priority = ThreadPriority.BelowNormal;
         }
 
         /// <summary>
@@ -52,8 +105,39 @@ namespace Serie_1.Pedro
         /// </summary>
         public void Shutdown()
         {
-            
-        }
+            lock (this)
+            {
+                _state = LoggerState.Shutdown;
 
+                if (_msgQueue.Count == 0)
+                {
+                    _myTw.Close();
+                    return;
+                }
+
+                do
+                {
+//                    try
+//                    {
+                        Monitor.Wait(this);
+//                    }
+//                    catch (ThreadInterruptedException)
+//                    {
+//                        foreach (var msg in _msgQueue)
+//                        {
+//                            _msgQueue.Remove(msg);
+//                        }
+//                        throw;
+//                    }
+
+                    if (_msgQueue.Count == 0)
+                    {
+                        _myTw.Close();
+                        return;
+                    }
+
+                } while (true);
+            }
+        }
     }
 }
