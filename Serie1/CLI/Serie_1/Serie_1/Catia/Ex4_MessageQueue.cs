@@ -62,8 +62,7 @@ namespace Serie_1.Catia
                 {
                     foreach (var msg in messageQueue.Where(msg => pred(msg.Type))) // Ver se há alguma message cujo tipo (int) satisfaça o predicado
                     {
-                        receivedMsg = msg;
-                        break;
+                        receivedMsg = msg; break;
                     }
                     if (receivedMsg != null)
                     {
@@ -83,13 +82,11 @@ namespace Serie_1.Catia
                     // Ver se há alguma message cujo tipo (int) satisfaça o predicado
                     foreach (var msg in messageQueue.Where(msg => pred(msg.Type))) // Ver se há alguma message cujo tipo (int) satisfaça o predicado
                     {
-                        receivedMsg = msg;
-                        break;
+                        receivedMsg = msg; break;
                     }
                     if (receivedMsg != null)
                     {
-                        messageQueue.Remove(receivedMsg);
-                        return receivedMsg;
+                        messageQueue.Remove(receivedMsg); break;
                     }
                     try
                     {
@@ -101,7 +98,11 @@ namespace Serie_1.Catia
                         Monitor.PulseAll(this); // Notificar as outras threads - pois uma delas poderá ter condições para ler uma mensagem
                         throw;
                     }
-                    timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout);
+                    
+                    if ((timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout)) != 0) continue;
+
+                    receivers.Remove(receiverThread);
+                    Monitor.PulseAll(this);
                 } while (timeout > 0);
             }
             return receivedMsg;
