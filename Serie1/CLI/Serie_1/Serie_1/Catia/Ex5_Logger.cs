@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace Serie_1.Catia
@@ -28,60 +27,59 @@ namespace Serie_1.Catia
      http://www.junit.org/ 1
      http://www.nunit.org/ 2
      * 
-     */
-    public class MsgSenderThread
+     */    
+    class Ex5Logger
     {
-        public int ThreadId { get; set; }
-        public string Msg { get; set; }
-
-        public MsgSenderThread(int tId, string m)
-        {
-            Msg = m;
-            ThreadId = tId;
-        }
-    }
-    
-    class Ex5_Logger
-    {
-
-        enum Logger_State
+        enum LoggerState
         {
             SHUTDOWN = 1,
             ACTIVE = 2,
             NOT_ACTIVE = 0,
         }
 
-        private LinkedList<String> messagesToWrite; 
-        private Logger_State state;
-        private Thread loggerThread; 
-        private TextWriter writer;
-
-        public Ex5_Logger(TextWriter writer)
+        private class MsgSenderThread
         {
-            state = Logger_State.NOT_ACTIVE;
-            this.writer = writer;
-            loggerThread.Priority = ThreadPriority.Lowest;
+            public int ThreadId { get; set; }
+            public string Msg { get; set; }
+
+            public MsgSenderThread(int tId, string m)
+            {
+                Msg = m;
+                ThreadId = tId;
+            }
         }
 
-        // Operação LogMessage
-        void LogMessage(string msg) // Recebe mensagem com relatório
+        private LinkedList<String> messagesToWrite; 
+        private LoggerState _state;
+        private Thread _loggerThread; 
+        private readonly TextWriter _writer;
+
+        public Ex5Logger(TextWriter writer, LinkedList<string> messagesToWrite)
+        {
+            _state = LoggerState.NOT_ACTIVE;
+            _writer = writer;
+            this.messagesToWrite = messagesToWrite;
+            _loggerThread.Priority = ThreadPriority.Lowest;
+        }
+
+        public void LogMessage(string msg) // Recebe mensagem com relatório
         {
             lock (this)
             {
-                if (state == Logger_State.SHUTDOWN) throw new Exception("LOGGER IS SHUTDOWN");
-                if(state == Logger_State.NOT_ACTIVE) Start();
-                loggerThread.Start(new MsgSenderThread(Thread.CurrentThread.ManagedThreadId,msg)); 
+                if (_state == LoggerState.SHUTDOWN) throw new Exception("LOGGER IS SHUTDOWN");
+                if(_state == LoggerState.NOT_ACTIVE) Start();
+                _loggerThread.Start(new MsgSenderThread(Thread.CurrentThread.ManagedThreadId,msg)); 
             }          
         }
 
         void Start()
         {   
-            loggerThread = new Thread((msgSenderThread) =>
+            _loggerThread = new Thread((msgSenderThread) =>
             {
                 lock (this)
                 {
-                    if (state == Logger_State.NOT_ACTIVE)
-                        state = Logger_State.ACTIVE;
+                    if (_state == LoggerState.NOT_ACTIVE)
+                        _state = LoggerState.ACTIVE;
 
                     messagesToWrite.AddLast(((MsgSenderThread)msgSenderThread).Msg);
 
@@ -89,7 +87,7 @@ namespace Serie_1.Catia
                     {
                         if (messagesToWrite.First == msgSenderThread)
                         {
-                            writer.WriteLine(msgSenderThread);
+                            _writer.WriteLine(msgSenderThread);
                             messagesToWrite.Remove(((MsgSenderThread) msgSenderThread).Msg);
                         }
                         try
@@ -106,16 +104,16 @@ namespace Serie_1.Catia
                     } while (true);
                 }
             });
-            state = Logger_State.ACTIVE;
+            _state = LoggerState.ACTIVE;
         }
 
-        void Shutdown()
+        public void Shutdown()
         {
             lock (this)
             {
-                if (state == Logger_State.SHUTDOWN) return;
+                if (_state == LoggerState.SHUTDOWN) return;
 
-                state = Logger_State.SHUTDOWN;
+                _state = LoggerState.SHUTDOWN;
 
                 do
                 {
@@ -128,7 +126,7 @@ namespace Serie_1.Catia
                     }
                     catch (ThreadInterruptedException iex)
                     {
-                        writer.Close();
+                        _writer.Close();
                         throw;
                     }
                 } while (true); 
