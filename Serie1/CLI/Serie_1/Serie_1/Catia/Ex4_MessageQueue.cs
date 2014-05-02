@@ -26,27 +26,18 @@ namespace Serie_1.Catia
     {
         public class Message<T>
         {
-            public int type;   // Tipo da mensagem: inteiro positivo
-            T data;     // Dados (T)
-           // bool received;
+            public int Type { get; set; } // Tipo da mensagem: inteiro positivo
+            protected T Data { get; set; } // Dados (T)
 
             public Message(int msgType, T msgData)
             {
-                type = msgType;
-                data = msgData;
-             //   received = false;   // Indica se a mensagem já foi recebida por uma Thread
+                Type = msgType;
+                Data = msgData;
             }
-
-            /*
-            public void SetReceived(bool recvd)
-            {
-                received = recvd;
-            }
-             * */
         }
 
         private LinkedList<Message<T>> messageQueue;
-        private LinkedList<bool> receivers; // bool = indica se já recebeu mensagem ou não
+        private LinkedList<bool> receivers; // bool = só porque sim... para ter uma lista com alguma coisa.
 
         public Ex4MessageQueue(){ //.CTOR
             messageQueue = new LinkedList<Message<T>>();
@@ -58,7 +49,7 @@ namespace Serie_1.Catia
             lock (this)
             {
                 messageQueue.AddLast(msg);
-                Monitor.PulseAll(this);
+                Monitor.PulseAll(this); // PulseAll: Acordar várias threads "receivers", pois se acordármos só 1 e ela ñ for a que tem condições,será preciso haver mais threads a ser acordadas
             }
         }
 
@@ -72,15 +63,12 @@ namespace Serie_1.Catia
                 {
                     // Ver se há alguma message cujo tipo (int) satisfaça o predicado
                     var messagesCompatible = new LinkedList<Message<T>>();
-
-                    foreach (var msg in messageQueue.Where(msg => pred(msg.type)))
+                    foreach (var msg in messageQueue.Where(msg => pred(msg.Type)))
                     {
                         messagesCompatible.AddLast(msg);
                     }
 
                     if(messagesCompatible.Count>0){
-                        // Colocar o boolean da Message a true, para a "Sender" Thread saber que a sua msg já foi recebida
-                        //(messagesCompatible.First.Value).SetReceived(true);
                         receivedMsg = messagesCompatible.First.Value;
                         messagesCompatible.RemoveFirst();
                         return receivedMsg;
@@ -88,7 +76,7 @@ namespace Serie_1.Catia
                 }
 
                 // Se é necessário ficar na Queue à espera da sua vez...
-                LinkedListNode<bool> receiverThread = new LinkedListNode<bool>(false);
+                var receiverThread = new LinkedListNode<bool>(false);
                 receivers.AddLast(receiverThread);
 
                 int lastTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
@@ -96,18 +84,16 @@ namespace Serie_1.Catia
                 do
                 {
                     // Ver se há alguma message cujo tipo (int) satisfaça o predicado
-                    LinkedList<Message<T>>messagesCompatible = new LinkedList<Message<T>>();
-                    foreach (var msg in messageQueue.Where(msg=>pred(msg.type)))
+                    var messagesCompatible = new LinkedList<Message<T>>();
+                    foreach (var msg in messageQueue.Where(msg=>pred(msg.Type)))
                     {
                         messagesCompatible.AddLast(msg);
                     }
 
                     if(receiverThread.Equals(receivers.First) && messagesCompatible.Count>0){
-                   
-                        // Colocar o boolean da Message a true = para a "Sender" Thread saber que a sua msg já foi recebida
-                        //(messagesCompatible.First.Value).SetReceived(true);
                         receivedMsg = messagesCompatible.First.Value;
                         messagesCompatible.RemoveFirst();
+                        receivers.Remove(receiverThread);
                         return receivedMsg;  
                     }
                     try
@@ -118,6 +104,7 @@ namespace Serie_1.Catia
                     {
                         receivers.Remove(receiverThread); // Tirar da lista de receivers - ñ é preciso verificar pois qd chega aqui, está garantida| na lista
                         Monitor.PulseAll(this); // Notificar as outras threads - pois uma delas poderá ter condições para ler uma mensagem
+                        throw;
                     }
                     timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout);
                 } while (timeout > 0);

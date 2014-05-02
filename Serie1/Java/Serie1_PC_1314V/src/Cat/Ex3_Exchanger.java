@@ -2,6 +2,8 @@ package Cat;
 
 import java.util.LinkedList;
 
+import Utils.SyncUtils;
+
 public class Ex3_Exchanger<T> {
 
 	/*
@@ -16,16 +18,18 @@ public class Ex3_Exchanger<T> {
 		thread invoque o método exchange. 
 	 */
 	
-	public class Message<T>{
-		protected T msg;
-		protected boolean consumed;
+	// Classe auxiliar & opcional
+	private class Message<K>{
+		protected K msg;
+		protected boolean paired; // Indica 
 		
-		public Message(T m){
+		public Message(K m){
 			msg = m;
-			consumed = false;
+			paired = false;
 		}
 	}
-	private LinkedList<Message<T>> messages; // Cada posição tem a mensagem e o número da thread
+	
+	private LinkedList<Message<T>> messages;
 	
 	// é chamado pelas threads para oferecer uma mensagem (myMsg) e receber uma mensagem oferecida (retorno)
 	// pela thread com que emparelham
@@ -33,36 +37,37 @@ public class Ex3_Exchanger<T> {
 
 		T receivedMsg = null;
 		
-		if(!messages.isEmpty()){
+		// Se já existe pelo menos 1 msg na lista e a 1ª ainda ñ tem par... emparelha e retorna!
+		// É garantida a ordem FIFO pois enquanto a 1ª msg não tiver par, as restantes também não terão.
+		if(!messages.isEmpty() && !messages.getFirst().paired){
 			receivedMsg = messages.getFirst().msg;
 			messages.getFirst().msg = myMsg;
-			messages.getFirst().consumed = true;
-			this.notifyAll();
+			messages.getFirst().paired = true;
+			this.notifyAll(); // Acorda as threads para elas verem se foi a sua msg a ser consumida
 			return receivedMsg;
 		}
 		
+		// Senão: Adicionar esta mensagem à lista
 		Message<T> offeredMsg = new Message<T>(myMsg);
+		messages.add(offeredMsg);
+		
+		long lastTime = System.currentTimeMillis();
 		do{
-			if(messages.isEmpty()){ // Adicionar esta mensagem à lista
-				messages.add(offeredMsg);
-			}
-			try{
-				this.notify();	// Notificar - Para que haja thread p/emparelhar
-				this.wait();
+			this.notify();	// Notificar - Para que haja thread p/emparelhar
+			try{	
+				this.wait();	// Esperar
 			}catch(InterruptedException iex){
-				messages.remove();
+				messages.remove(); // Ñ é necessário verificar se já pertence à lista; pois já há certezas disso
 				throw iex;
 			}
-			
-			// Wait for another message to be offered for consumption 
-			if(offeredMsg.consumed){
-				T msg = offeredMsg.msg;
+			// Verificar se a msg oferecida para troca já foi consumida
+			if(offeredMsg.paired){
+				receivedMsg = offeredMsg.msg;
 				messages.remove(offeredMsg);
-				return msg; // Mensagem substituída! agora "msg" é a mensagem oferecida pela outra thread!
+				break; // Mensagem substituída! agora "msg" é a mensagem oferecida pela outra thread! Retornar.
 			}
-			if(timeout==0){
-				//timeout= SyncUtils.;
-			}
-		}while(true);
+			timeout = SyncUtils.adjustTimeout(lastTime, timeout);
+		}while(timeout>0);
+		return receivedMsg;
 	}
 }
