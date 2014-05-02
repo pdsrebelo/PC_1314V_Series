@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Serie_1.Catia
 {
@@ -32,30 +27,110 @@ namespace Serie_1.Catia
      http://www.junit.org/ 1
      http://www.nunit.org/ 2
      * 
-     */
-    class Ex5_Logger
+     */    
+    class Ex5Logger
     {
-        Thread loggerThread;
-
-        public Ex5_Logger(/*TextWriter writer*/)
+        enum LoggerState
         {
-
+            SHUTDOWN = 1,
+            ACTIVE = 2,
+            NOT_ACTIVE = 0,
         }
 
-        // Operação LogMessage
-        void LogMessage(string msg) // Recebe mensagem com relatório
+        private class MsgSenderThread
         {
+            public int ThreadId { get; set; }
+            public string Msg { get; set; }
 
+            public MsgSenderThread(int tId, string m)
+            {
+                Msg = m;
+                ThreadId = tId;
+            }
+        }
+
+        private LinkedList<String> messagesToWrite; 
+        private LoggerState _state;
+        private Thread _loggerThread; 
+        private readonly TextWriter _writer;
+
+        public Ex5Logger(TextWriter writer, LinkedList<string> messagesToWrite)
+        {
+            _state = LoggerState.NOT_ACTIVE;
+            _writer = writer;
+            this.messagesToWrite = messagesToWrite;
+            _loggerThread.Priority = ThreadPriority.Lowest;
+        }
+
+        public void LogMessage(string msg) // Recebe mensagem com relatório
+        {
+            lock (this)
+            {
+                if (_state == LoggerState.SHUTDOWN) throw new Exception("LOGGER IS SHUTDOWN");
+                if(_state == LoggerState.NOT_ACTIVE) Start();
+                _loggerThread.Start(new MsgSenderThread(Thread.CurrentThread.ManagedThreadId,msg)); 
+            }          
         }
 
         void Start()
-        {
+        {   
+            _loggerThread = new Thread((msgSenderThread) =>
+            {
+                lock (this)
+                {
+                    if (_state == LoggerState.NOT_ACTIVE)
+                        _state = LoggerState.ACTIVE;
 
+                    messagesToWrite.AddLast(((MsgSenderThread)msgSenderThread).Msg);
+
+                    do
+                    {
+                        if (messagesToWrite.First == msgSenderThread)
+                        {
+                            _writer.WriteLine(msgSenderThread);
+                            messagesToWrite.Remove(((MsgSenderThread) msgSenderThread).Msg);
+                        }
+                        try
+                        {
+                            Monitor.Wait(this);
+                        }
+                        catch (ThreadInterruptedException iex)
+                        {
+                            messagesToWrite.Remove(((MsgSenderThread)msgSenderThread).Msg);
+                            Monitor.PulseAll(this);
+                            //TODO 
+                        }
+
+                    } while (true);
+                }
+            });
+            _state = LoggerState.ACTIVE;
         }
 
-        void Shutdown()
+        public void Shutdown()
         {
+            lock (this)
+            {
+                if (_state == LoggerState.SHUTDOWN) return;
 
+                _state = LoggerState.SHUTDOWN;
+
+                do
+                {
+                    // Esperar pelo fim de todas as escritas 
+                    if (messagesToWrite.Count == 0)
+                        return;
+                    try
+                    {
+                        Monitor.Wait(this);
+                    }
+                    catch (ThreadInterruptedException iex)
+                    {
+                        _writer.Close();
+                        throw;
+                    }
+                } while (true); 
+            }
         }
     }
 }

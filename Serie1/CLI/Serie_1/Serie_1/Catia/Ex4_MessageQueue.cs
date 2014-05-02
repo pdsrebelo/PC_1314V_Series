@@ -55,22 +55,18 @@ namespace Serie_1.Catia
 
         public Message<T> Receive(int timeout, Predicate<int> pred)
         {
+            Message<T> receivedMsg = null;
             lock (this)
             {
-                Message<T> receivedMsg;
-
                 if (receivers.Count == 0 && messageQueue.Count>0) // Se não é necessário esperar pela sua vez (ñ é necessário colocar na queue)...
                 {
-                    // Ver se há alguma message cujo tipo (int) satisfaça o predicado
-                    var messagesCompatible = new LinkedList<Message<T>>();
-                    foreach (var msg in messageQueue.Where(msg => pred(msg.Type)))
+                    foreach (var msg in messageQueue.Where(msg => pred(msg.Type))) // Ver se há alguma message cujo tipo (int) satisfaça o predicado
                     {
-                        messagesCompatible.AddLast(msg);
+                        receivedMsg = msg; break;
                     }
-
-                    if(messagesCompatible.Count>0){
-                        receivedMsg = messagesCompatible.First.Value;
-                        messagesCompatible.RemoveFirst();
+                    if (receivedMsg != null)
+                    {
+                        messageQueue.Remove(receivedMsg);
                         return receivedMsg;
                     }
                 }
@@ -84,17 +80,13 @@ namespace Serie_1.Catia
                 do
                 {
                     // Ver se há alguma message cujo tipo (int) satisfaça o predicado
-                    var messagesCompatible = new LinkedList<Message<T>>();
-                    foreach (var msg in messageQueue.Where(msg=>pred(msg.Type)))
+                    foreach (var msg in messageQueue.Where(msg => pred(msg.Type))) // Ver se há alguma message cujo tipo (int) satisfaça o predicado
                     {
-                        messagesCompatible.AddLast(msg);
+                        receivedMsg = msg; break;
                     }
-
-                    if(receiverThread.Equals(receivers.First) && messagesCompatible.Count>0){
-                        receivedMsg = messagesCompatible.First.Value;
-                        messagesCompatible.RemoveFirst();
-                        receivers.Remove(receiverThread);
-                        return receivedMsg;  
+                    if (receivedMsg != null)
+                    {
+                        messageQueue.Remove(receivedMsg); break;
                     }
                     try
                     {
@@ -106,10 +98,14 @@ namespace Serie_1.Catia
                         Monitor.PulseAll(this); // Notificar as outras threads - pois uma delas poderá ter condições para ler uma mensagem
                         throw;
                     }
-                    timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout);
+                    
+                    if ((timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout)) != 0) continue;
+
+                    receivers.Remove(receiverThread);
+                    Monitor.PulseAll(this);
                 } while (timeout > 0);
             }
-            return null;
+            return receivedMsg;
         }
     }
 }
