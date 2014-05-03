@@ -29,7 +29,7 @@ namespace Serie_1
         /// </summary>
         /// <param name="mlock"></param>
         /// <param name="interrupted"></param>
-        public static void EnterUninterruptibly(object mlock, out bool interrupted)
+        private static void EnterUninterruptibly(object mlock, out bool interrupted)
         {
             interrupted = false;
             do
