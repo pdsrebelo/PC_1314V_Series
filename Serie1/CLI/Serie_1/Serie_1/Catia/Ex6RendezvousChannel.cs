@@ -53,7 +53,8 @@ namespace Serie_1.Catia
      * 
         Na resolução deste exercício procure minimizar as comutações de thread, usando as técnicas que 
         foram discutidas nas aulas teóricas. 
-        Note que a implementação em Java exigirá alterações à interface pública da classe.         */
+        Note que a implementação em Java exigirá alterações à interface pública da classe. 
+        */
 
     public class Ex6RendezvousChannel<S,R>
     {
@@ -176,5 +177,27 @@ namespace Serie_1.Catia
                 Monitor.Pulse(rendezVousToken);
             }
         }
+
+        // Usado para notificação específica
+        // Serve para adquirir o lock de um objecto.
+        // "informa" se a thread foi interrompida, ao tentar adquirir o lock
+        private static void EnterUninterruptibly(object mlock, out bool interrupted)
+        {
+            interrupted = false;
+            do
+            {
+                try
+                {
+                    Monitor.Enter(mlock);
+                    break;
+                }
+                catch (ThreadInterruptedException iex)
+                {
+                    interrupted = true;
+                }
+            } while (true);
+        }
+
+
     }
 }
