@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Serie_1.Pedro
@@ -15,7 +16,6 @@ namespace Serie_1.Pedro
     /// </summary>
     class Ex6_Rendezvous<S,R>
     {
-
         LinkedList<S> _clientRequests = new LinkedList<S>(); 
 
         /// <summary>
@@ -36,10 +36,10 @@ namespace Serie_1.Pedro
         /// <returns></returns>
         public bool Request(S service, int timeout, out R response)
         {
+            lock (this)
+            {
 
-
-
-
+            }
             response = default(R);
             return false;
         }
@@ -58,8 +58,33 @@ namespace Serie_1.Pedro
         /// <returns></returns>
         public object Accept(int timeout, out S service)
         {
-            service = default(S);
-            return null;
+            lock (this)
+            {
+                if (_clientRequests.Count > 0)
+                {
+
+                }
+
+                int lastTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0;
+
+                // Não existem pedidos de serviço pendentes, bloqueia-se a thread até que haja um ou a thread seja interrompida/dê timeout.
+                do
+                {
+                    try
+                    {
+                        SyncUtils.Wait(this, null, timeout);
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        
+                    }
+                    if (SyncUtils.AdjustTimeout(ref lastTime, ref timeout) == 0)
+                    {
+                        service = default(S);
+                        return null;
+                    }
+                } while (true);
+            }
         }
 
         /// <summary>

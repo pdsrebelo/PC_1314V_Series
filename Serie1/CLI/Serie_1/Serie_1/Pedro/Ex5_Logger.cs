@@ -86,7 +86,7 @@ namespace Serie_1.Pedro
 
                         if (_msgQueue.First == myNode)
                         {
-                            // TODO : Comparar a thread actual com a loggerthread (priority), NOT FINISHED!
+                            // TODO : Comparar a thread actual com a loggerthread (priority), NOT FINISHED! (Não faz sentido!!)
                             if (Thread.CurrentThread.Priority < _loggerThread.Priority)
                             {
                                 _myTw.Write(msg);

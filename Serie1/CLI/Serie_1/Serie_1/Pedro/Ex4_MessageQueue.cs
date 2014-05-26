@@ -60,7 +60,7 @@ namespace Serie_1.Pedro
                     {
                         if (selector(msg.Type)) // Existe uma mensagem com um predicado compativel comigo
                         {
-                             retMsg = msg; // TODO: Ou new Message<T>(msg.Type, msg.Data); ??
+                             retMsg = msg;
                             // We can't delete and return here because: http://www.dotnetperls.com/invalidoperationexception
                         }
                     }
@@ -99,7 +99,7 @@ namespace Serie_1.Pedro
                         {
                             if (selector(msg.Type)) // Existe uma mensagem com um predicado compativel comigo (aqui não faz sentido usar PulseAll)
                             {
-                                retMsg = msg; // TODO: Ou new Message<T>(msg.Type, msg.Data); ??
+                                retMsg = msg;
                             }
                         }
                     }
