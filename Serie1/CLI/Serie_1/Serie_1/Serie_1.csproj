@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Catia\Ex1_Completion.cs" />
+    <Compile Include="Catia\Ex6RendezvousChannel.cs" />
     <Compile Include="Pedro\Ex1_Completion.cs" />
     <Compile Include="Pedro\Ex4_MessageQueue.cs" />
     <Compile Include="Pedro\Ex5_Logger.cs" />

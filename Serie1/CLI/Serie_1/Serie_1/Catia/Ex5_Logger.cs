@@ -81,6 +81,7 @@ namespace Serie_1.Catia
                     if (_state == LoggerState.NOT_ACTIVE)
                         _state = LoggerState.ACTIVE;
 
+                    
                     messagesToWrite.AddLast(((MsgSenderThread)msgSenderThread).Msg);
 
                     do
