@@ -76,7 +76,6 @@ public class Ex6_RendezvousChannel<S,R> {
                 success = true;
                 break;
             }
-            
             try
             {
                 request.waitCondition.wait(timeout);

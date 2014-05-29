@@ -6,6 +6,7 @@ import Utils.SyncUtils;
 
 public class Ex3_Exchanger<T> {
 
+	// TODO USAR DELEGAÇÃO DE EXECUÇÃO
 	/*
 	 * 3. 
 	 * 	Implemente em Java o sincronizador exchanger Exchanger<T> que permite a troca, entre pares de 
@@ -58,6 +59,7 @@ public class Ex3_Exchanger<T> {
 				this.wait();	// Esperar
 			}catch(InterruptedException iex){
 				messages.remove(); // Ñ é necessário verificar se já pertence à lista; pois já há certezas disso
+				// TODO fazer interrupt a propria thread
 				throw iex;
 			}
 			// Verificar se a msg oferecida para troca já foi consumida
