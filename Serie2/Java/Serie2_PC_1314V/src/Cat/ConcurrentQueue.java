@@ -4,6 +4,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ConcurrentQueue<T> {
 	
+	/* SERIE 2 - EXERCICIO 2 
+		Implemente em Java e C# a classe ConcurrentQueue<T> que define um contentor com disciplina 
+		FIFO (First-In-First-Out) suportado numa lista simplesmente ligada. A classe disponibiliza as 
+		operações put, tryTake e isEmpty. A operação put coloca no fim da fila o elemento passado 
+		como argumento; a operação tryTake retorna o elemento presente no início da fila, ou null caso 
+		da file estar vazia; a operação isEmpty produz o valor booleano que indica se a fila contém 
+		elementos. A implementação suporta acessos concorrentes e as operações disponibilizadas não 
+		bloqueiam a thread invocante. 
+		Nota: Para a implementação considere a explicação sobre a lock-free queue, proposta por Michael e 
+		Scott, que consta no Capítulo 15 do livro Java Concurrency in Practice.
+	*/
+	
 	private class CNode<K> {
 		final K value;
 		final AtomicReference<CNode<K>> nextNode;
@@ -11,7 +23,7 @@ public class ConcurrentQueue<T> {
 		public CNode(K val, CNode<K> next) {
 			value = val;
 			nextNode = new AtomicReference<CNode<K>>(next);
-		}
+		} 
 	}
 	
 	private CNode<T>dummy = new CNode<T>(null, null);
