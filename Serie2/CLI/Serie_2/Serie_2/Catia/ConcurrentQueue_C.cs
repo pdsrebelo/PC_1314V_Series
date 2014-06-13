@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Serie_2.Catia
 {
-    class ConcurrentQueue_C
+    class ConcurrentQueue_C<T>
     {
     }
 }
