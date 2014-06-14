@@ -47,31 +47,37 @@ namespace Serie_2.Catia
 
         void put(object newValue)
         {
-            bool success = false;
             do
             {
                 Node<T> readTailNode = _tailNode;
-
-                if (_tailNode == readTailNode && _tailNode.Next == null)
+                
+                if(_tailNode != readTailNode)
+                    continue;
+                
+                if (_tailNode.Next == null)
                 {
-                    if (Interlocked.CompareExchange(ref _tailNode.Next, new Node<T>(newValue), null) == null)
-                        success = true;
+                    Interlocked.CompareExchange(ref _tailNode.Next, new Node<T>(newValue), null);
+                    break;
                 }
-                else
-                {
-                    // Update the tail node
-                    if (_tailNode != readTailNode) continue;
-                    if (Interlocked.CompareExchange(ref _tailNode, _tailNode.Next, readTailNode) == readTailNode)
-                        success = true;
-                }
+                // Update the tail node
+                Interlocked.CompareExchange(ref _tailNode, _tailNode.Next, readTailNode);
+                break;
             }
-            while (!success) ;
+            while (true) ;
         }
 
         object tryTake()
         {
-            object valueToReturn = null;
-            return valueToReturn;
+            do
+            {
+                Node<T> currHead = _headNode;
+
+                if (currHead != _headNode) continue;
+                if (currHead.Value == null)
+                    return null;
+                Interlocked.CompareExchange(ref _headNode, _headNode.Next, currHead);
+                return currHead.Value;
+            } while (true);
         }
 
         bool IsEmpty()
