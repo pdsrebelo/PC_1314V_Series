@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Serie_2.Catia
 {
+    #pragma warning disable 420
     class ConcurrentQueueC<T>
     {
         class Node<TK>
@@ -43,9 +45,27 @@ namespace Serie_2.Catia
             _tailNode = new Node<T>(null) {Next = _dummyNode};
         } 
 
-        void put(T newValue)
+        void put(object newValue)
         {
-            
+            bool success = false;
+            do
+            {
+                Node<T> readTailNode = _tailNode;
+
+                if (_tailNode == readTailNode && _tailNode.Next == null)
+                {
+                    if (Interlocked.CompareExchange(ref _tailNode.Next, new Node<T>(newValue), null) == null)
+                        success = true;
+                }
+                else
+                {
+                    // Update the tail node
+                    if (_tailNode != readTailNode) continue;
+                    if (Interlocked.CompareExchange(ref _tailNode, _tailNode.Next, readTailNode) == readTailNode)
+                        success = true;
+                }
+            }
+            while (!success) ;
         }
 
         object tryTake()
