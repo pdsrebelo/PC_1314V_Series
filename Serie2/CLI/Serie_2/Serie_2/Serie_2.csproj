@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Catia\Completion_C.cs" />
     <Compile Include="Catia\ConcurrentQueue_C.cs" />
+    <Compile Include="Catia\SyncUtils.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
