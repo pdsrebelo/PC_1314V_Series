@@ -35,7 +35,8 @@ namespace Serie_2.Catia
         public void CompleteAll()
         {
             var currStatus = _signaled;
-            while (Interlocked.CompareExchange(ref _signaled, 1, currStatus) != currStatus){} // When the exchange is done, arg#3 is returned
+            Interlocked.CompareExchange(ref _signaled, 1, currStatus); 
+            // The return value of CompareExchange is the original value in location1, whether or not the exchange takes place. SRC = http://msdn.microsoft.com/en-us/library/h7etff8w.aspx
         }
 
         //TODO VERIFY
