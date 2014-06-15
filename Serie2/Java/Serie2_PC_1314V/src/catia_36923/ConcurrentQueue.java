@@ -1,4 +1,4 @@
-package Cat;
+package catia_36923;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -64,12 +64,10 @@ public class ConcurrentQueue<T> {
 				return null;
 			
 			CNode<T>headPtr = queueHead.get();
-			CNode<T>currHead = headPtr.nextNode.get();//headPtr.nextNode.get(); 
-			CNode<T>nextHead = currHead.nextNode.get();
 			
 			// Actualiza a head, se a informação lida estiver consistente, senão tenta novamente
-			if(queueHead.compareAndSet(queueHead.get(), nextHead)){
-				return currHead.value;
+			if(queueHead.compareAndSet(headPtr, headPtr.nextNode.get())){
+				return queueHead.get().value;
 			}
 		}while(true);
 	}
