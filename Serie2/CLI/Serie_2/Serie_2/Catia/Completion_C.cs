@@ -19,7 +19,7 @@ namespace Serie_2.Catia
         private volatile int _permits;
 
         // .CTOR
-        public CompletionC(int permits, bool signaled)
+        public CompletionC(int permits)
         {
             if (permits > 0) _permits = permits;
             _signaled = 0;  // Starts unsignaled
@@ -35,7 +35,7 @@ namespace Serie_2.Catia
         public void CompleteAll()
         {
             var currStatus = _signaled;
-            Interlocked.CompareExchange(ref _signaled, 1, currStatus);
+            while (Interlocked.CompareExchange(ref _signaled, 1, currStatus) != currStatus){} // When the exchange is done, arg#3 is returned
         }
 
         //TODO VERIFY
@@ -44,7 +44,7 @@ namespace Serie_2.Catia
             if (_signaled == 1) // Signaled to please all
                 return true;
 
-            if (timeout == 0)   // Timeout
+            if (timeout == 0)   // Timed out
                 return false;
 
             if (_permits >= 1)  // Verify if there are enough permits to "Acquire"
@@ -61,7 +61,6 @@ namespace Serie_2.Catia
                     Interlocked.Decrement(ref _permits);
                     return true;
                 }
-
                 timeout = SyncUtils.AdjustTimeout(ref initialTime, ref timeout); // Update the time
 
             } while (timeout>0);
@@ -69,5 +68,4 @@ namespace Serie_2.Catia
             return false;
         }
     }
-    
 }
