@@ -1,19 +1,8 @@
-﻿/*
- * INSTITUTO SUPERIOR DE ENGENHARIA DE LISBOA
- * Licenciatura em Engenharia Informática e de Computadores
- *
- * Programação Concorrente - Inverno de 2009-2010
- * Paulo Pereira
- *
- * Código base para a 3ª Série de Exercícios.
- *
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace Tracker
+namespace Serie_3_Cat
 {
     /// <summary>
     /// Singleton class that contains information regarding the tracked files, namely, the files' names
@@ -54,6 +43,7 @@ namespace Tracker
         private Store()
         {
             _store = new Dictionary<string, HashSet<IPEndPoint>>();
+
             noLocations = new IPEndPoint[0];
         }
 

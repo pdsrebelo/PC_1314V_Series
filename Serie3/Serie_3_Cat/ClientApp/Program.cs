@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 using System.Windows.Forms;
+using ClientApp;
 
-namespace ClientApp
+namespace Serie_3_Cat
 {
     static class Program
     {
+
         /// <summary>
-        /// The main entry point for the application.
+        /// The main entry point for the Client application.
         /// </summary>
         [STAThread]
         static void Main()

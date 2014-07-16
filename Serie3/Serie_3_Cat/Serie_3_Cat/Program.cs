@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Windows.Forms;
-using Tracker;
 
 namespace Serie_3_Cat
 {
@@ -201,45 +200,6 @@ namespace Serie_3_Cat
                 }
             }
         }
-
-        public static void ShowInfo(Store store)
-        {
-            foreach (string fileName in store.GetTrackedFiles())
-            {
-                Console.WriteLine(fileName);
-                foreach (IPEndPoint endPoint in store.GetFileLocations(fileName))
-                {
-                    Console.Write(endPoint + " ; ");
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-        }
-
-        /*
-                static void TestStore()
-                {
-                    Store store = Store.Instance;
-
-                    store.Register("xpto", new IPEndPoint(IPAddress.Parse("193.1.2.3"), 1111));
-                    store.Register("xpto", new IPEndPoint(IPAddress.Parse("194.1.2.3"), 1111));
-                    store.Register("xpto", new IPEndPoint(IPAddress.Parse("195.1.2.3"), 1111));
-                    ShowInfo(store);
-                    Console.ReadLine();
-                    store.Register("ypto", new IPEndPoint(IPAddress.Parse("193.1.2.3"), 1111));
-                    store.Register("ypto", new IPEndPoint(IPAddress.Parse("194.1.2.3"), 1111));
-                    ShowInfo(store);
-                    Console.ReadLine();
-                    store.Unregister("xpto", new IPEndPoint(IPAddress.Parse("195.1.2.3"), 1111));
-                    ShowInfo(store);
-                    Console.ReadLine();
-
-                    store.Unregister("xpto", new IPEndPoint(IPAddress.Parse("193.1.2.3"), 1111));
-                    store.Unregister("xpto", new IPEndPoint(IPAddress.Parse("194.1.2.3"), 1111));
-                    ShowInfo(store);
-                    Console.ReadLine();
-                }
-        */
 
 
         /// <summary>

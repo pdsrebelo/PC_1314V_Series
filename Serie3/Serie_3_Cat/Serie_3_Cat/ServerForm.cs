@@ -38,8 +38,6 @@ namespace Serie_3_Cat
                 loggerForm.Show();
                 logger.Start();
                 loggerForm.Update();
-
-
             }
             catch (FormatException ex)
             {

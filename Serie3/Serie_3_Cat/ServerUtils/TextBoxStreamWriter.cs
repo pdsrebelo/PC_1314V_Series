@@ -3,7 +3,7 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Serie_3_Cat.Server
+namespace Serie_3_Cat
 {
     public class TextBoxStreamWriter : TextWriter
     {
@@ -34,5 +34,4 @@ namespace Serie_3_Cat.Server
             get { return System.Text.Encoding.UTF8; }
         }
     }
-    
 }

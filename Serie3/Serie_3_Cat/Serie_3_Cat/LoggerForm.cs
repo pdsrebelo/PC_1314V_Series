@@ -15,10 +15,8 @@ namespace Serie_3_Cat
             textBox1.Enabled = false; 
             _port = port;
             _logger = logger;
-            _logger.setLoggerTextBox(textBox1);
+            _logger.SetLoggerTextBox(textBox1);
             label4.Text = _port.ToString();
-
-           // label3.Text = DateTime.Now;
         }
 
         public void Update()

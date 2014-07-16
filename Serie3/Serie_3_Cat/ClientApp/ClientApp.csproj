@@ -51,6 +51,7 @@
     <Compile Include="ClientPanelForm.Designer.cs">
       <DependentUpon>ClientPanelForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientRequest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ClientPanelForm.resx">
@@ -77,6 +78,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serie_3_Cat\ServerApp.csproj">
+      <Project>{2F2ECB6A-C910-4EED-950D-A532A6210AF9}</Project>
+      <Name>ServerApp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServerUtils\ServerUtils.csproj">
+      <Project>{0BA74047-8E59-4C62-A38C-8EC8EE1A949F}</Project>
+      <Name>ServerUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

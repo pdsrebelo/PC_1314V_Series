@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using Serie_3_Cat;
-using Tracker;
 
 
 /// <summary>
@@ -39,22 +38,32 @@ public class Listener
                 _server = new TcpListener(IPAddress.Loopback, portNumber);
                 _server.Start();
             }
-             catch (SocketException sock)
+            catch (ArgumentOutOfRangeException argex)
             {
-                MessageBox.Show(@"The specified port is already in use by another server!");
-                _server=null;
+                MessageBox.Show(@"The port number inserted is not valid!", @"ERROR");
+                _server = null;
+                throw argex;
+            }
+            catch (SocketException sock)
+            {
+                MessageBox.Show(@"The specified port is already in use by another server!",
+                    @"ERROR");
+                _server = null;
                 throw sock;
             }
 
-            if (_server == null) return;
             // Define the callback method - which will be called whenever a client request ends;
             AsyncCallback onAcceptCallback = null;
 
             onAcceptCallback = delegate(IAsyncResult ar)
             {
                 TcpClient conn = null;
+
                 try
                 {
+                    //
+                    // TODO resolver problema!
+                    //
                     log.LogMessage("Listener - Waiting for connection requests.");
 
                     // Asynchronously accepts an incoming connection attempt and creates a new TcpClient to handle remote host communication.
@@ -65,8 +74,8 @@ public class Listener
 
                     // Process the previously accepted connection.
                     /////////////////////////////////////////////////////////////////////
-
                     log.LogMessage("Listener - Processing the previously accepted connection...");
+
                     using (TcpClient socket = _server.AcceptTcpClient())
                     {
                         socket.LingerState = new LingerOption(true, 10);
@@ -78,7 +87,7 @@ public class Listener
                         protocolHandler.Run();
                     }
 
-                    Program.ShowInfo(Store.Instance);
+                    Utils.ShowInfo(Store.Instance);
                     /////////////////////////////////////////////////////////////////////
                 }
                 catch (SocketException sockex)

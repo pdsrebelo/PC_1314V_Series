@@ -1,19 +1,23 @@
+ï»¿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 /*
  * INSTITUTO SUPERIOR DE ENGENHARIA DE LISBOA
- * Licenciatura em Engenharia Informática e de Computadores
+ * Licenciatura em Engenharia InformÃ¡tica e de Computadores
  *
- * Programação Concorrente - Inverno de 2009-2010
- * João Trindade
+ * ProgramaÃ§Ã£o Concorrente - Inverno de 2009-2010
+ * JoÃ£o Trindade
  *
- * Código base para a 3ª Série de Exercícios.
+ * CÃ³digo base para a 3Âª SÃ©rie de ExercÃ­cios.
  *
  */
-
-using System;
 using System.IO;
 using System.Threading;
+using System.Web.UI.Design;
 using System.Windows.Forms;
-using Serie_3_Cat.Server;
 
 
 namespace Serie_3_Cat
@@ -25,7 +29,7 @@ namespace Serie_3_Cat
         public DateTime start_time { get; private set; }
         private volatile int num_requests;
         private string fileName;//TODO
-        private TextBox _txtBox;
+        private Control _txtBox;
 
         public Logger() : this(Console.Out) { }
         public Logger(string logfile) : this(new StreamWriter(new FileStream(logfile, FileMode.Append, FileAccess.Write))) { }
@@ -35,10 +39,14 @@ namespace Serie_3_Cat
             writer = awriter;
         }
 
-        //TODO
-        public void setLoggerTextBox(TextBox tb)
+        public void SetLoggerTextBox(TextBox ctrl)
         {
-            writer = new TextBoxStreamWriter(tb);
+            //TODO
+            //Control _txtWriterControl = new Control();
+            //ControlPersister.PersistControl(writer, _txtWriterControl);
+            
+            _txtBox = ctrl;
+            writer = new TextBoxStreamWriter(ctrl);
         }
 
         public void Start()
@@ -51,6 +59,11 @@ namespace Serie_3_Cat
 
         public void LogMessage(string msg)
         {
+            if (_txtBox!=null && _txtBox.InvokeRequired) // Se o writer pertence a um elemento Control que estÃ¡ noutra thread
+            {
+                _txtBox.BeginInvoke(new Action(() => LogMessage(msg)));
+                return;
+            }
             writer.WriteLine(String.Format("{0}: {1}", DateTime.Now, msg));
         }
 
