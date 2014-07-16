@@ -57,17 +57,18 @@ public class Listener
 
             onAcceptCallback = delegate(IAsyncResult ar)
             {
-                TcpClient conn = null;
+                TcpClient socket = null;
+
 
                 try
                 {
                     //
                     // TODO resolver problema!
                     //
-                    log.LogMessage("Listener - Waiting for connection requests.");
+                    
 
                     // Asynchronously accepts an incoming connection attempt and creates a new TcpClient to handle remote host communication.
-                    conn = _server.EndAcceptTcpClient(ar);
+                    socket = _server.EndAcceptTcpClient(ar);
 
                     // Begins an asynchronous operation to accept an incoming connection attempt.
                     _server.BeginAcceptTcpClient(onAcceptCallback, _server);
@@ -76,8 +77,9 @@ public class Listener
                     /////////////////////////////////////////////////////////////////////
                     log.LogMessage("Listener - Processing the previously accepted connection...");
 
-                    using (TcpClient socket = _server.AcceptTcpClient())
+                    //using (TcpClient socket = _server.AcceptTcpClient())
                     {
+                        
                         socket.LingerState = new LingerOption(true, 10);
                         log.LogMessage(String.Format("Listener - Connection established with {0}.",
                             socket.Client.RemoteEndPoint));
