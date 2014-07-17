@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -38,8 +39,8 @@ namespace ClientApp
 
         private void button3_Click(object sender, System.EventArgs e)
         {
-            _connection._clientSocket.Close();
-            //TODO Cancel the client connection to server!
+            _connection.CloseConnection();
+            Close();
         }
     }
 }

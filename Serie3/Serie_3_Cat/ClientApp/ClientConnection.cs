@@ -27,7 +27,7 @@ namespace Serie_3_Cat
             try
             {
                 _clientSocket = new TcpClient();
-              //  _clientSocket.ConnectAsync(IPAddress.Parse(_address), _port);
+                _clientSocket.ConnectAsync(IPAddress.Parse(_address), _port);
 
                 //Store storeOperation = new Store();
                 //storeOperation.Register("xpto_file_example1.txt", endPoint);
@@ -40,7 +40,7 @@ namespace Serie_3_Cat
 
         public void Register(IEnumerable<string> files)//, string adress, ushort port)
         {
-            _clientSocket.ConnectAsync(_address, _port);//IPAddress.Loopback, _port);
+            //_clientSocket.ConnectAsync(_address, _port);//IPAddress.Loopback, _port);
 
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
@@ -55,12 +55,12 @@ namespace Serie_3_Cat
             output.WriteLine();
 
             output.Close();
-            _clientSocket.Close();
+            //_clientSocket.Close();
         }
 
         public void Unregister(string file)//, string address, ushort port)
         {
-            _clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
+            //_clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
 
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
@@ -72,12 +72,12 @@ namespace Serie_3_Cat
             output.WriteLine();
 
             output.Close();
-            _clientSocket.Close();
+           // _clientSocket.Close();
         }
 
         public void ListFiles()
         {
-            _clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
+           // _clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
 
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
@@ -94,14 +94,19 @@ namespace Serie_3_Cat
                 Console.WriteLine(line);
 
             output.Close();
-            _clientSocket.Close();
+          //  _clientSocket.Close();
             
+        }
+
+        public void CloseConnection()
+        {
+            _clientSocket.Close();
         }
 
         public void ListLocations(string fileName)
         {
 
-            _clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
+            //_clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
 
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
@@ -120,7 +125,7 @@ namespace Serie_3_Cat
                 Console.WriteLine(line);
 
             output.Close();
-            _clientSocket.Close();
+           // _clientSocket.Close();
             
         }
 
