@@ -20,8 +20,9 @@ namespace ClientApp
         {
 //          textBox2.Text = @"<This thread>";
             ct = new CancellationToken();
-            
-            ClientRequest newClient = new ClientRequest("", Convert.ToInt32(textBox1.Text));
+
+            int port = Convert.ToInt32(textBox1.Text);
+            ClientConnection newClient = new ClientConnection("", port);
 
             textBox1.Clear();
 
@@ -30,11 +31,5 @@ namespace ClientApp
             ClientConnectionForm connectionForm = new ClientConnectionForm(newClient);
             connectionForm.Show();
         }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
     }
 }
