@@ -58,6 +58,17 @@ namespace ServerClientUtils
 			++_numRequests;
 		}
 
+	    public void EndMark()
+	    {
+            _writer.WriteLine();	        
+	    }
+
+	    public void EndMarkAndFlush()
+	    {
+	        _writer.WriteLine();
+            _writer.Flush();
+	    }
+
 		public void Stop()
 		{
 			long elapsed = DateTime.Now.Ticks - StartTime.Ticks;

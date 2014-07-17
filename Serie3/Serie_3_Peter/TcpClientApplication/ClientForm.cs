@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Windows.Forms;
+using ServerClientUtils;
 
 namespace TcpClientApplication
 {
     public partial class ClientForm : Form
     {
         private readonly Client _client;
+        private readonly Logger _log;
 
         public ClientForm(int port)
         {
@@ -14,7 +16,9 @@ namespace TcpClientApplication
 
             label2.Text = Convert.ToString(port);
 
-            _client = new Client(port, IPAddress.Loopback);
+            _log = new Logger(new TextBoxWriter(textBox1));
+
+            _client = new Client(port, IPAddress.Loopback, _log);
 
             Show();
         }
@@ -37,14 +41,18 @@ namespace TcpClientApplication
             Console.WriteLine(@"List files:");
         }
 
-//            Console.WriteLine(@"List locations xpto");
-//            client.ListLocations("xpto");
-//            
-//            Console.WriteLine(@"List locations ypto");
-//            client.ListLocations("ypto");
-//            
-//            Console.WriteLine(@"List locations zpto");
-//            client.ListLocations("zpto");
-//            Console.ReadLine();
+        private void ListFile_Click(object sender, EventArgs e)
+        {
+            if (!String.IsNullOrEmpty(textBox2.Text))
+                _client.ListLocations(textBox2.Text);
+            else
+                MessageBox.Show(@"Please input a valid file");
+        }
+
+        private void Stop_Click(object sender, EventArgs e)
+        {
+            // Stops the logger
+            _client.Stop();
+        }
     }
 }

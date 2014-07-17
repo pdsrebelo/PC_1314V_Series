@@ -34,6 +34,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.port = new System.Windows.Forms.Label();
             this.ListAllFiles = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.ListFile = new System.Windows.Forms.Button();
+            this.Stop = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox1
@@ -49,9 +52,9 @@
             // 
             // Register
             // 
-            this.Register.Location = new System.Drawing.Point(72, 417);
+            this.Register.Location = new System.Drawing.Point(51, 371);
             this.Register.Name = "Register";
-            this.Register.Size = new System.Drawing.Size(211, 66);
+            this.Register.Size = new System.Drawing.Size(168, 55);
             this.Register.TabIndex = 8;
             this.Register.Text = "Register";
             this.Register.UseVisualStyleBackColor = true;
@@ -59,9 +62,9 @@
             // 
             // Unregister
             // 
-            this.Unregister.Location = new System.Drawing.Point(348, 417);
+            this.Unregister.Location = new System.Drawing.Point(51, 443);
             this.Unregister.Name = "Unregister";
-            this.Unregister.Size = new System.Drawing.Size(211, 66);
+            this.Unregister.Size = new System.Drawing.Size(168, 58);
             this.Unregister.TabIndex = 9;
             this.Unregister.Text = "Unregister";
             this.Unregister.UseVisualStyleBackColor = true;
@@ -86,7 +89,7 @@
             // 
             // ListAllFiles
             // 
-            this.ListAllFiles.Location = new System.Drawing.Point(497, 12);
+            this.ListAllFiles.Location = new System.Drawing.Point(231, 443);
             this.ListAllFiles.Name = "ListAllFiles";
             this.ListAllFiles.Size = new System.Drawing.Size(168, 55);
             this.ListAllFiles.TabIndex = 12;
@@ -94,11 +97,41 @@
             this.ListAllFiles.UseVisualStyleBackColor = true;
             this.ListAllFiles.Click += new System.EventHandler(this.ListAllFiles_Click);
             // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(415, 395);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(168, 31);
+            this.textBox2.TabIndex = 13;
+            // 
+            // ListFile
+            // 
+            this.ListFile.Location = new System.Drawing.Point(231, 371);
+            this.ListFile.Name = "ListFile";
+            this.ListFile.Size = new System.Drawing.Size(168, 55);
+            this.ListFile.TabIndex = 14;
+            this.ListFile.Text = "List Files";
+            this.ListFile.UseVisualStyleBackColor = true;
+            this.ListFile.Click += new System.EventHandler(this.ListFile_Click);
+            // 
+            // Stop
+            // 
+            this.Stop.Location = new System.Drawing.Point(415, 443);
+            this.Stop.Name = "Stop";
+            this.Stop.Size = new System.Drawing.Size(168, 55);
+            this.Stop.TabIndex = 15;
+            this.Stop.Text = "Stop";
+            this.Stop.UseVisualStyleBackColor = true;
+            this.Stop.Click += new System.EventHandler(this.Stop_Click);
+            // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(677, 513);
+            this.Controls.Add(this.Stop);
+            this.Controls.Add(this.ListFile);
+            this.Controls.Add(this.textBox2);
             this.Controls.Add(this.ListAllFiles);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.port);
@@ -120,6 +153,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label port;
         private System.Windows.Forms.Button ListAllFiles;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button ListFile;
+        private System.Windows.Forms.Button Stop;
 
     }
 }
