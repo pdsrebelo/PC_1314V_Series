@@ -21,7 +21,18 @@ namespace ClientApp
 //          textBox2.Text = @"<This thread>";
             ct = new CancellationToken();
 
-            int port = Convert.ToInt32(textBox1.Text);
+            int port;
+            try
+            {
+                port = Convert.ToInt32(textBox1.Text);
+            }
+            catch (FormatException fex)
+            {
+                textBox1.Clear();
+                MessageBox.Show("Invalid TCP Port! Please try again!", "ERROR");
+                return;
+            }
+
             ClientConnection newClient = new ClientConnection("", port);
 
             textBox1.Clear();

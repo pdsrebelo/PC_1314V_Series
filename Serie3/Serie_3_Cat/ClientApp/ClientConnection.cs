@@ -40,10 +40,16 @@ namespace Serie_3_Cat
 
         public void Register(IEnumerable<string> files)//, string adress, ushort port)
         {
-            //_clientSocket.ConnectAsync(_address, _port);//IPAddress.Loopback, _port);
-
-            StreamWriter output = new StreamWriter(_clientSocket.GetStream());
-
+            StreamWriter output = null;
+            try
+            {
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
+            catch (InvalidOperationException iox)
+            {
+                MessageBox.Show(@"The Client Socket isn't connected to the server!", @"ERROR");
+                return;
+            }
             // Send request type line
             output.WriteLine("REGISTER");
 
@@ -55,13 +61,10 @@ namespace Serie_3_Cat
             output.WriteLine();
 
             output.Close();
-            //_clientSocket.Close();
         }
 
         public void Unregister(string file)//, string address, ushort port)
         {
-            //_clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
-
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
             // Send request type line
@@ -72,13 +75,10 @@ namespace Serie_3_Cat
             output.WriteLine();
 
             output.Close();
-           // _clientSocket.Close();
         }
 
         public void ListFiles()
         {
-           // _clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
-
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
             // Send request type line
@@ -92,10 +92,9 @@ namespace Serie_3_Cat
             StreamReader input = new StreamReader(_clientSocket.GetStream());
             while ((line = input.ReadLine()) != null && line != string.Empty)
                 Console.WriteLine(line);
-
-            output.Close();
-          //  _clientSocket.Close();
             
+            output.Close();
+            input.Close();
         }
 
         public void CloseConnection()
@@ -105,9 +104,6 @@ namespace Serie_3_Cat
 
         public void ListLocations(string fileName)
         {
-
-            //_clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
-
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
             // Send request type line
@@ -125,8 +121,6 @@ namespace Serie_3_Cat
                 Console.WriteLine(line);
 
             output.Close();
-           // _clientSocket.Close();
-            
         }
 
 

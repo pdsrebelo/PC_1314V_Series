@@ -7,20 +7,26 @@ namespace Serie_3_Cat
 {
     public class TextBoxStreamWriter : TextWriter
     {
-        private readonly TextBox _output;
+        public TextBox TextBox { get; private set; }
         private Boolean _enabled;
 
-        public TextBoxStreamWriter(TextBox output)
+        public TextBoxStreamWriter(TextBox textBox)
         {
             _enabled = true;
-            _output = output;
+            TextBox = textBox;
         }
 
         public override void Write(char value)
         {
-            if (!_enabled) return;
+            if (!_enabled) return;      
             base.Write(value);
-            _output.AppendText(value.ToString()); // When character data is written, append it to the text box.
+            if (TextBox.InvokeRequired)
+            {
+                //TODO verificar se ainda da erro!!
+                TextBox.BeginInvoke(new Action(() => TextBox.AppendText(value.ToString())));//LogMessage(msg)));
+                return;
+            }
+            TextBox.AppendText(value.ToString()); // When character data is written, append it to the text box.
         }
 
         public override void Close()

@@ -54,34 +54,40 @@ public class Listener
 
             // Define the callback method - which will be called whenever a client request ends;
             AsyncCallback onAcceptCallback = null;
+            int nseconds = 10;
 
             onAcceptCallback = delegate(IAsyncResult ar)
             {
+                log.IncrementRequests();
+                TcpClient socket = null;
+                EndPoint clientEndPoint = null;
                 try
                 {
                     // Asynchronously accept an incoming connection attempt 
                     // and create a new TcpClient to handle remote host communication
-                    TcpClient socket = _server.EndAcceptTcpClient(ar);
+                    socket = _server.EndAcceptTcpClient(ar);
 
                     // Begin an async operation: to accept an incoming connection attempt
                     _server.BeginAcceptTcpClient(onAcceptCallback, _server);
 
-                    // Process the previously accepted connection.
+                    // Process the accepted connection.
                     /////////////////////////////////////////////////////////////////////
-                    log.LogMessage("Listener - Processing the previously accepted connection...");
+                    log.LogMessage("Listener - Processing the accepted connection...");
                     
-                    socket.LingerState = new LingerOption(true, 10);
-                       
+                    socket.LingerState = new LingerOption(true, nseconds);
+
+                    clientEndPoint = socket.Client.RemoteEndPoint;
                     log.LogMessage(String.Format("Listener - Connection established with {0}.",
-                        socket.Client.RemoteEndPoint));
+                        clientEndPoint));
 
                     // Instantiate protocol handler and associate it to the current TCP connection
                     var protocolHandler = new Program.Handler(socket.GetStream(), log);
                         
                     // Synchronously process request made through the connection
                     protocolHandler.Run();
+
                     
-                    Utils.ShowInfo(Store.Instance);
+                    Utils.ShowInfo(Store.Instance, log.Writer);
                     /////////////////////////////////////////////////////////////////////
                 }
                 catch (SocketException sockex)
@@ -96,6 +102,10 @@ public class Listener
                     // So, we just ignore it!
                     //
                 }
+                log.LogMessage(socket != null && socket.Connected
+                    ? String.Format("Listener - Time left for socket to be disconnected: {0} seconds.",
+                        socket.Client.LingerState.LingerTime)
+                    : String.Format("Listener - Connection closed with {0}.", clientEndPoint));
             };
 
             // Begins an asynchronous operation to accept an incoming connection attempt.
