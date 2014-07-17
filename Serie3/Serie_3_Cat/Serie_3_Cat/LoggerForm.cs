@@ -21,7 +21,7 @@ namespace Serie_3_Cat
 
         public void Update()
         {
-            label3.Text = _logger.start_time.ToString();
+            label3.Text = _logger.StartTime.ToString();
         }
 
         private void stopLoggerBtn_Click(object sender, EventArgs e)

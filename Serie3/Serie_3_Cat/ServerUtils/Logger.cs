@@ -1,60 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-/*
- * INSTITUTO SUPERIOR DE ENGENHARIA DE LISBOA
- * Licenciatura em Engenharia Informática e de Computadores
- *
- * Programação Concorrente - Inverno de 2009-2010
- * João Trindade
- *
- * Código base para a 3ª Série de Exercícios.
- *
- */
 using System.IO;
 using System.Threading;
-using System.Web.UI.Design;
 using System.Windows.Forms;
-
 
 namespace Serie_3_Cat
 {
-    // Logger single-threaded.
+    #pragma warning disable 420
     public class Logger
     {
-        private TextWriter writer;
-        public DateTime start_time { get; private set; }
-        private volatile int num_requests;
-        private string fileName;//TODO
-        private Control _txtBox;
+        public DateTime StartTime { get; private set; }
+        public volatile TextWriter Writer;
+        private volatile int _numRequests;
+        private volatile Control _txtBox;
+        private readonly string _logFileName;//TODO
 
         public Logger() : this(Console.Out) { }
         public Logger(string logfile) : this(new StreamWriter(new FileStream(logfile, FileMode.Append, FileAccess.Write))) { }
         public Logger(TextWriter awriter)
         {
-            num_requests = 0;
-            writer = awriter;
+            _numRequests = 0;
+            Writer = awriter;
         }
 
-        public void SetLoggerTextBox(TextBox ctrl)
+        public void SetLoggerTextBox(TextBox txtBox)
         {
             //TODO
             //Control _txtWriterControl = new Control();
             //ControlPersister.PersistControl(writer, _txtWriterControl);
-            
-            _txtBox = ctrl;
-            writer = new TextBoxStreamWriter(ctrl);
+
+            Interlocked.Exchange(ref _txtBox, txtBox);
+            var txbxWriter = new TextBoxStreamWriter(txtBox);
+            Interlocked.Exchange(ref Writer, txbxWriter);
         }
 
         public void Start()
         {
-            start_time = DateTime.Now;
-            writer.WriteLine();
-            writer.WriteLine(String.Format("::- LOG STARTED @ {0} -::", DateTime.Now));
-            writer.WriteLine();
+            StartTime = DateTime.Now;
+            Writer.WriteLine();
+            Writer.WriteLine(String.Format("::- LOG STARTED @ {0} -::", StartTime));
+            Writer.WriteLine();   
         }
 
         public void LogMessage(string msg)
@@ -64,23 +48,23 @@ namespace Serie_3_Cat
                 _txtBox.BeginInvoke(new Action(() => LogMessage(msg)));
                 return;
             }
-            writer.WriteLine(String.Format("{0}: {1}", DateTime.Now, msg));
+            Writer.WriteLine(String.Format("{0}: {1}", DateTime.Now, msg));
         }
 
         public void IncrementRequests()
         {
-            Interlocked.Increment(ref num_requests); //++num_requests;
+            Interlocked.Increment(ref _numRequests);
         }
 
         public void Stop()
         {
-            long elapsed = DateTime.Now.Ticks - start_time.Ticks;
-            writer.WriteLine();
+            long elapsed = DateTime.Now.Ticks - StartTime.Ticks;
+            Writer.WriteLine();
             LogMessage(String.Format("Running for {0} second(s)", elapsed / 10000000L));
-            LogMessage(String.Format("Number of request(s): {0}", num_requests));
-            writer.WriteLine();
-            writer.WriteLine(String.Format("::- LOG STOPPED @ {0} -::", DateTime.Now));
-            writer.Close();
+            LogMessage(String.Format("Number of request(s): {0}", _numRequests));
+            Writer.WriteLine();
+            Writer.WriteLine(String.Format("::- LOG STOPPED @ {0} -::", DateTime.Now));
+            Writer.Close();
         }
     }
 }
