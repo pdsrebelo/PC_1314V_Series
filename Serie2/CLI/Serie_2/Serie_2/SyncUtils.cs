@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Serie_2.Catia
+namespace Serie_2
 {
 
     class SyncUtils

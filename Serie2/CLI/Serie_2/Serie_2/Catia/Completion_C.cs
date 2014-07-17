@@ -10,7 +10,8 @@ namespace Serie_2.Catia
         versão optimizada do sincronizador Completion (cuja especificação consta no exercício 1 da 
         primeira série de exercícios). As optimizações devem incidir sobre a situação em que a operação 
         WaitForCompletion não bloqueia a thread invocante e as situações em que as operações 
-        Complete, CompleteAll não têm que libertar nenhuma thread bloqueada.     */
+        Complete, CompleteAll não têm que libertar nenhuma thread bloqueada. 
+    */
    
     #pragma warning disable 420 // Disable warnings for using "ref" on volatile vars
     class CompletionC
