@@ -8,7 +8,6 @@ namespace TcpClientApplication
     public partial class ClientForm : Form
     {
         private readonly Client _client;
-        private readonly Logger _log;
 
         public ClientForm(int port)
         {
@@ -16,9 +15,7 @@ namespace TcpClientApplication
 
             label2.Text = Convert.ToString(port);
 
-            _log = new Logger(new TextBoxWriter(textBox1));
-
-            _client = new Client(port, IPAddress.Loopback, _log);
+            _client = new Client(port, IPAddress.Loopback, new Logger(new TextBoxWriter(textBox1)));
 
             Show();
         }

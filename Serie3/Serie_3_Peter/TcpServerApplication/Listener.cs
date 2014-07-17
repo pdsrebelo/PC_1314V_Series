@@ -15,6 +15,12 @@ namespace TcpServerApplication
         private TcpListener _srv;
 
         /// <summary>
+        /// The amount of time to remain connected after calling 
+        /// the Socket.Close method if data remains to be sent.
+        /// </summary>
+        private const int LingerTime = 3; 
+
+        /// <summary>
         /// TCP port number in use.
         /// </summary>
         private readonly int _portNumber;
@@ -48,7 +54,6 @@ namespace TcpServerApplication
         {
             try
             {
-                const int lingerTime = 10; // The amount of time to remain connected after calling the Socket.Close method if data remains to be sent.
                 _srv = new TcpListener(IPAddress.Loopback, _portNumber);
                 _srv.Start();
                 
@@ -58,20 +63,19 @@ namespace TcpServerApplication
 
                 callback = delegate(IAsyncResult iar)
                 {
-                    
+                    TcpClient socket = _srv.EndAcceptTcpClient(iar);
                     log.LogMessage("Listener - Waiting for connection requests.");
                     _srv.BeginAcceptTcpClient(callback, _srv);
 
                     // Process the previous request
                     try
                     {
-                        TcpClient socket = _srv.EndAcceptTcpClient(iar);
-                        socket.LingerState = new LingerOption(true, lingerTime);
+                        socket.LingerState = new LingerOption(true, LingerTime);
                         log.LogMessage(String.Format("Listener - Connection established with {0}.",
                             socket.Client.RemoteEndPoint));
 
                         log.LogMessage(String.Format("Listener - Connection is going to last {0} seconds", 
-                            lingerTime));
+                            LingerTime));
 
                         // Instantiating protocol handler and associate it to the current TCP connection
                         Handler protocolHandler = new Handler(socket.GetStream(), log);
