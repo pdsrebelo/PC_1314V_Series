@@ -47,8 +47,9 @@ namespace Serie_3_Cat
             }
             catch (InvalidOperationException iox)
             {
-                MessageBox.Show(@"The Client Socket isn't connected to the server!", @"ERROR");
-                return;
+                Reconnect();
+                MessageBox.Show(@"The Client Socket isn't connected to the server! Reconnecting...", @"ERROR");
+                output = new StreamWriter(_clientSocket.GetStream());
             }
             // Send request type line
             output.WriteLine("REGISTER");
@@ -65,8 +66,22 @@ namespace Serie_3_Cat
 
         public void Unregister(string file)//, string address, ushort port)
         {
-            StreamWriter output = new StreamWriter(_clientSocket.GetStream());
-
+            if (file.Equals(""))
+            {
+                MessageBox.Show(@"Please insert a valid file name before selecting the 'Unregister' option!", @"ERROR");
+                return;
+            }
+            StreamWriter output = null;
+            try
+            {
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
+            catch (InvalidOperationException oex)
+            {
+                Reconnect();
+                MessageBox.Show(@"The Client Socket isn't connected to the server! Reconnecting...", @"Information");
+                output = new StreamWriter(_clientSocket.GetStream());   
+            }
             // Send request type line
             output.WriteLine("UNREGISTER");
             // Send message payload
@@ -77,10 +92,24 @@ namespace Serie_3_Cat
             output.Close();
         }
 
+        private void Reconnect()
+        {
+            _clientSocket = new TcpClient(_address,_port);
+        }
+
         public void ListFiles()
         {
-            StreamWriter output = new StreamWriter(_clientSocket.GetStream());
-
+            StreamWriter output = null;
+            try
+            {
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
+            catch (InvalidOperationException iex)
+            {
+                Reconnect(); 
+                MessageBox.Show(@"The Client Socket isn't connected to the server! Reconnecting...", @"ERROR");
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
             // Send request type line
             output.WriteLine("LIST_FILES");
             // Send message end mark and flush it
