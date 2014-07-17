@@ -57,38 +57,30 @@ public class Listener
 
             onAcceptCallback = delegate(IAsyncResult ar)
             {
-                TcpClient socket = null;
-
-
                 try
                 {
-                    //
-                    // TODO resolver problema!
-                    //
-                    
+                    // Asynchronously accept an incoming connection attempt 
+                    // and create a new TcpClient to handle remote host communication
+                    TcpClient socket = _server.EndAcceptTcpClient(ar);
 
-                    // Asynchronously accepts an incoming connection attempt and creates a new TcpClient to handle remote host communication.
-                    socket = _server.EndAcceptTcpClient(ar);
-
-                    // Begins an asynchronous operation to accept an incoming connection attempt.
+                    // Begin an async operation: to accept an incoming connection attempt
                     _server.BeginAcceptTcpClient(onAcceptCallback, _server);
 
                     // Process the previously accepted connection.
                     /////////////////////////////////////////////////////////////////////
                     log.LogMessage("Listener - Processing the previously accepted connection...");
+                    
+                    socket.LingerState = new LingerOption(true, 10);
+                       
+                    log.LogMessage(String.Format("Listener - Connection established with {0}.",
+                        socket.Client.RemoteEndPoint));
 
-                    //using (TcpClient socket = _server.AcceptTcpClient())
-                    {
+                    // Instantiate protocol handler and associate it to the current TCP connection
+                    var protocolHandler = new Program.Handler(socket.GetStream(), log);
                         
-                        socket.LingerState = new LingerOption(true, 10);
-                        log.LogMessage(String.Format("Listener - Connection established with {0}.",
-                            socket.Client.RemoteEndPoint));
-                        // Instantiating protocol handler and associate it to the current TCP connection
-                        Program.Handler protocolHandler = new Program.Handler(socket.GetStream(), log);
-                        // Synchronously process requests made through de current TCP connection
-                        protocolHandler.Run();
-                    }
-
+                    // Synchronously process request made through the connection
+                    protocolHandler.Run();
+                    
                     Utils.ShowInfo(Store.Instance);
                     /////////////////////////////////////////////////////////////////////
                 }

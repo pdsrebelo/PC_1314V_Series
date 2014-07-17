@@ -40,7 +40,7 @@
             // 
             // connectToServerBtn
             // 
-            this.connectToServerBtn.Location = new System.Drawing.Point(15, 105);
+            this.connectToServerBtn.Location = new System.Drawing.Point(208, 109);
             this.connectToServerBtn.Name = "connectToServerBtn";
             this.connectToServerBtn.Size = new System.Drawing.Size(109, 21);
             this.connectToServerBtn.TabIndex = 0;
@@ -50,17 +50,22 @@
             // 
             // welcomeMessageLbl
             // 
+            this.welcomeMessageLbl.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
             this.welcomeMessageLbl.AutoSize = true;
-            this.welcomeMessageLbl.Location = new System.Drawing.Point(12, 9);
+            this.welcomeMessageLbl.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.welcomeMessageLbl.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.welcomeMessageLbl.ForeColor = System.Drawing.Color.Purple;
+            this.welcomeMessageLbl.Location = new System.Drawing.Point(143, 9);
             this.welcomeMessageLbl.Name = "welcomeMessageLbl";
             this.welcomeMessageLbl.Size = new System.Drawing.Size(55, 13);
             this.welcomeMessageLbl.TabIndex = 1;
             this.welcomeMessageLbl.Text = "Welcome!";
+            this.welcomeMessageLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // clickBtnMessageLabel
             // 
             this.clickBtnMessageLabel.AutoSize = true;
-            this.clickBtnMessageLabel.Location = new System.Drawing.Point(12, 89);
+            this.clickBtnMessageLabel.Location = new System.Drawing.Point(99, 93);
             this.clickBtnMessageLabel.Name = "clickBtnMessageLabel";
             this.clickBtnMessageLabel.Size = new System.Drawing.Size(218, 13);
             this.clickBtnMessageLabel.TabIndex = 2;
@@ -76,6 +81,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.ForeColor = System.Drawing.Color.DarkOrchid;
             this.label1.Location = new System.Drawing.Point(12, 32);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(60, 13);
@@ -85,6 +91,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.DarkOrchid;
             this.label2.Location = new System.Drawing.Point(15, 60);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(108, 13);
@@ -109,7 +116,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(320, 142);
+            this.ClientSize = new System.Drawing.Size(328, 142);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);

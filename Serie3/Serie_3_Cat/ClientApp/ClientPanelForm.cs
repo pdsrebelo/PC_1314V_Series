@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Windows.Forms;
 using Serie_3_Cat;
 
@@ -14,12 +15,25 @@ namespace ClientApp
             InitializeComponent();
         }
 
+        private CancellationToken ct;
         private void button1_Click(object sender, System.EventArgs e)
         {
-//            textBox2.Text = @"<This thread>";
-            ClientRequest newClient = new ClientRequest(textBox2.Text, Convert.ToInt32(textBox1.Text));
+//          textBox2.Text = @"<This thread>";
+            ct = new CancellationToken();
+            
+            ClientRequest newClient = new ClientRequest("", Convert.ToInt32(textBox1.Text));
+
+            textBox1.Clear();
 
             // Do stuff with the newly created client request
+
+            ClientConnectionForm connectionForm = new ClientConnectionForm(newClient);
+            connectionForm.Show();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
         }
 
     }

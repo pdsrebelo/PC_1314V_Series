@@ -45,15 +45,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientConnectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientConnectionForm.Designer.cs">
+      <DependentUpon>ClientConnectionForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ClientPanelForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ClientPanelForm.Designer.cs">
       <DependentUpon>ClientPanelForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ClientRequest.cs" />
+    <Compile Include="ClientConnection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ClientConnectionForm.resx">
+      <DependentUpon>ClientConnectionForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClientPanelForm.resx">
       <DependentUpon>ClientPanelForm.cs</DependentUpon>
     </EmbeddedResource>

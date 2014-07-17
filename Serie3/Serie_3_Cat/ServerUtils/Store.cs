@@ -40,7 +40,7 @@ namespace Serie_3_Cat
         /// <summary>
         /// Initiates the store instance.
         /// </summary>
-        private Store()
+        public Store()
         {
             _store = new Dictionary<string, HashSet<IPEndPoint>>();
 
