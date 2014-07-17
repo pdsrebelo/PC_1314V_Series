@@ -28,14 +28,7 @@ namespace Serie_3_Cat
 
         public void SetLoggerTextBox(TextBox txtBox)
         {
-            //TODO
-            //Control _txtWriterControl = new Control();
-            //ControlPersister.PersistControl(writer, _txtWriterControl);
-            
             TextBoxWriter = new TextBoxStreamWriter(txtBox);
-
-            //var txbxWriter = new TextBoxStreamWriter(txtBox);
-            //Interlocked.Exchange(ref Writer, txbxWriter);
         }
 
         public void Start()
@@ -84,7 +77,6 @@ namespace Serie_3_Cat
             }
             Writer.WriteLine();
             Writer.WriteLine("::- LOG STOPPED @ {0} -::", DateTime.Now);
-            //LogMessage(String.Format("\n::- LOG STOPPED @ {0} -::", DateTime.Now));
             Writer.Close();
         }
     }
