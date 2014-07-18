@@ -28,13 +28,17 @@ namespace FileSearchApp
 
             var search = FileSearcher.startSearch(rootFolder, extension, charSequenceToSearch, 
                 new TextBoxStreamWriter(searchResultsTextBox));
+
+
         }
 
         // Cancel Button Clicked
         private void button2_Click(object sender, EventArgs e)
         {
+            MessageBox.Show(@"You shall fuck yourself! Cancel button isn't working yet!", @"WARNING");
+            
             //TODO Use the cancellation Token to cancel the search that is in progress 
-            FileSearcher.startSearch();
+           // FileSearcher.Cancel(_searcher);
         }
     }
 }
