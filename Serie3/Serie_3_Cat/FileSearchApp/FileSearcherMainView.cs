@@ -17,7 +17,7 @@ namespace FileSearchApp
         {
             //TODO Start Searching
             string rootFolder = rootFolderTextBox.Text;
-            string extension = searchResultsTextBox.Text;
+            string extension = fileExtensionTextBox.Text;
             string charSequenceToSearch = charSequenceTextBox.Text;
 
             if (rootFolder.Equals("") || extension.Equals("") || charSequenceToSearch.Equals(""))
@@ -35,7 +35,7 @@ namespace FileSearchApp
         // Cancel Button Clicked
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(@"You shall fuck yourself! Cancel button isn't working yet!", @"WARNING");
+            MessageBox.Show(@"You shall go fuck yourself! Cancel button isn't working yet!", @"YOU!");
             
             //TODO Use the cancellation Token to cancel the search that is in progress 
            // FileSearcher.Cancel(_searcher);
