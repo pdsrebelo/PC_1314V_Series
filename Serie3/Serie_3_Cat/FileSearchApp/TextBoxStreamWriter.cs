@@ -22,7 +22,6 @@ namespace Serie_3_Cat
             base.Write(value);
             if (TextBox.InvokeRequired)
             {
-                //TODO verificar se ainda da erro!!
                 TextBox.BeginInvoke(new Action(() => TextBox.AppendText(value.ToString())));//LogMessage(msg)));
                 return;
             }

@@ -26,19 +26,27 @@ namespace FileSearchApp
                 return;
             }
 
-            var search = FileSearcher.startSearch(rootFolder, extension, charSequenceToSearch, 
-                new TextBoxStreamWriter(searchResultsTextBox));
+            var search = FileSearcher.startSearch(rootFolder, extension, charSequenceToSearch);
 
-
+            TextBoxStreamWriter writer = new TextBoxStreamWriter(searchResultsTextBox);
+            foreach (var file in search._filesWithExtensionAndSequence)
+            {
+                writer.WriteLine(file);
+            }
         }
 
         // Cancel Button Clicked
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(@"You shall go fuck yourself! Cancel button isn't working yet!", @"YOU!");
+            MessageBox.Show(@"Cancel button isn't working yet!", @"Warning");
             
             //TODO Use the cancellation Token to cancel the search that is in progress 
            // FileSearcher.Cancel(_searcher);
+        }
+
+        private void exitButton_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }
