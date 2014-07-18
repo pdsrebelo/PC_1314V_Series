@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 
@@ -17,18 +18,41 @@ namespace FileSearchTPL
         contém a lista dos nomes dos ficheiros (i.e. caminhos absolutos) que cumprem os critérios de 
         pesquisa, o número de ficheiros encontrados com a extensão especificada e o número total de ficheiros 
         encontrados.*/
-        private static volatile List<string> finalResult;
+
+        internal class FileSearchResult
+        {
+            public int _totalFilesFound { get; private set; }
+            public int _totalFilesWithValidExtension { get; private set; }
+            public List<string> _filesWithExtensionAndSequence { get; private set; }
+
+            public FileSearchResult(int allFiles, int validFilesCount, List<string> validfilesfound)
+            {
+                _totalFilesFound = allFiles;
+                _totalFilesWithValidExtension = validFilesCount;
+                _filesWithExtensionAndSequence = validfilesfound;
+            }
+        }
+        
         static void Main(string[] args)
         {
-            finalResult = new List<string>();
             if (args.Length < 3)
             {
                 Console.WriteLine("Invalid number of arguments! Press any key to exit...");
                 Console.ReadLine();
                 return;
             }
+            
+            FileSearchResult result = startSearch(args);
+            
+            Console.WriteLine("\n\n ~ ~ ~ RESULTS ~ ~ ~ ");
+            Console.WriteLine("\nTotal Files in Directory " + args[0] + " = " + result._totalFilesFound);
+            Console.WriteLine("\nTotal Files With Extension " + args[1] + " = " + result._totalFilesWithValidExtension);
+            Console.WriteLine("\nFiles found, with sequence = " + args[2] + ":");
 
-            startSearch(args);
+            foreach (var fileName in result._filesWithExtensionAndSequence)
+                Console.WriteLine(fileName);
+
+            Console.WriteLine("\n\nPress any key to exit...");
             Console.ReadKey();
         }
 
@@ -37,74 +61,61 @@ namespace FileSearchTPL
         //  - searchable files extension    // args[2]
         //  - char sequence to search       // args[3]
 
-        public static async void startSearch(String[] args)
+        public static FileSearchResult startSearch(String[] args)
         {
             // Call the method
-            string searchRoot = args[0];
-            string fileExtension = args[1];
-            string charSequence = args[2];
-            Task[] tasks = null;
-            var t = new Task<List<string>>(() =>
+            string searchRoot = args[0], fileExtension = args[1], charSequence = args[2];
+            var finalResult = new List<string>();
+
+            var result = new List<string>();
+            int nCPU = Environment.ProcessorCount;
+            
+            int allFiles = Directory.GetFiles(searchRoot,"*.*",SearchOption.AllDirectories).Count();
+            var searchableFiles = new List<string>(Directory.GetFiles(searchRoot, "*." + fileExtension, SearchOption.AllDirectories));
+            int allFilesWithExt = searchableFiles.Count;
+            int maximumFilesPerCpu = searchableFiles.Count / nCPU;
+
+            if (searchableFiles.Count < nCPU)
             {
-                var result = new List<string>();
-                int nCPU = Environment.ProcessorCount;
-                var searchableFiles = new List<string>(Directory.GetFiles(searchRoot, "*." + fileExtension, SearchOption.AllDirectories));
-                int maximumFilesPerCpu = searchableFiles.Count / nCPU;
-
-                if (searchableFiles.Count < nCPU)
-                {
-                    nCPU = searchableFiles.Count;
-                    maximumFilesPerCpu = 1;
-                }
-
-                tasks = new Task<List<string>>[nCPU];
-
-                for (var i = 0; i < nCPU; i++)
-                {
-                    //TODO Define the files that each task will be responsible for examining!
-                    List<String> files = new List<string>(maximumFilesPerCpu);
-
-                    int j = 0;
-                    while (searchableFiles.Count > 0)
-                    {
-                        files.Add(searchableFiles.ToArray().GetValue(0) as string);
-                        searchableFiles.RemoveAt(0);
-                        if (j++ == maximumFilesPerCpu) break;
-                    }
-
-                    // Define the action that will be associated to each of the tasks
-                    tasks[i] = new Task<List<string>>(
-                        () => files.Count > 0 ? SearchFileWithCharSequence(files, charSequence) : null);
-                    tasks[i].Start();
-                }
-
-                // Wait for all the tasks to finish their work
-                Task.WaitAll(tasks, 1000);
-
-                // Process the result (the tasks have already finished their work!)
-                foreach (var task in tasks)
-                {
-                    List<string> partialResult = ((Task<List<string>>)task).Result;
-                    if (partialResult != null && partialResult.Count > 0)
-                    {
-                        finalResult.AddRange(partialResult);
-                    }
-                }
-
-                // Return the names of all the files that contain the specified char sequence
-                return result;
-            });
-            //            var t = new Task<List<string>>(() => 
-            //                result = SearchFilesWithCharSequence(args[0], args[1], args[2]));
-            t.Start();
-           
-            Task.WaitAll(new Task[]{t});
-            // Show the resulsts
-            Console.WriteLine("\nFiles found:");
-            foreach (var fileName in finalResult)
-            {
-                Console.WriteLine(fileName);
+                nCPU = searchableFiles.Count;
+                maximumFilesPerCpu = 1;
             }
+
+            Task[]tasks = new Task<List<string>>[nCPU];
+
+            for (var i = 0; i < nCPU; i++)
+            {
+                //TODO Define the files that each task will be responsible for examining!
+                var files = new List<string>(maximumFilesPerCpu);
+
+                int j = 0;
+                while (searchableFiles.Count > 0)
+                {
+                    files.Add(searchableFiles.ToArray().GetValue(0) as string);
+                    searchableFiles.RemoveAt(0);
+                    if (j++ == maximumFilesPerCpu) break;
+                }
+
+                // Define the action that will be associated to each of the tasks
+                tasks[i] = Task<List<string>>.Factory.StartNew(() => files.Count > 0 ? SearchFileWithCharSequence(files, charSequence) : new List<string>());
+            }
+
+            Task.WaitAll(tasks);
+            
+            Task k = Task.Delay(100);
+            k.Wait();
+            
+            foreach (var task in tasks)
+            {
+                List<string> partialResult = ((Task<List<string>>)task).Result;
+                if (partialResult != null && partialResult.Count > 0)
+                {
+                    finalResult.AddRange(partialResult);
+                }
+            }
+
+            // Show the results
+            return new FileSearchResult(allFiles, allFilesWithExt, finalResult);
         }
 
         private static List<string> SearchFileWithCharSequence(List<string> fileNames, string charSequence)
