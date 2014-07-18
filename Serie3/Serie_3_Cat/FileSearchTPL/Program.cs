@@ -63,12 +63,8 @@ namespace FileSearchTPL
 
         public static List<string> SearchFilesWithCharSequence(string searchRoot, string fileExtension, string charSequence)
         {
-            List<string> result = new List<string>();
-
-            CancellationToken ct = new CancellationToken();
+            var result = new List<string>();
             int nCPU = Environment.ProcessorCount;
-            
-
             List<String> searchableFiles = GetFilesWithExtension(searchRoot, fileExtension);
             int maximumFilesPerCpu = searchableFiles.Count/nCPU;
 
@@ -79,7 +75,7 @@ namespace FileSearchTPL
             }
             Task<List<string>>[] tasks = new Task<List<string>>[nCPU];
 
-            for (int i = 0; i < nCPU; i++)
+            for (var i = 0; i < nCPU; i++)
             {
                 //TODO Define the files that each task will be responsible for examining!
                 List<String> files = new List<string>(maximumFilesPerCpu);
@@ -89,17 +85,12 @@ namespace FileSearchTPL
                 {
                     files.Add(searchableFiles.ToArray().GetValue(0) as string);
                     searchableFiles.RemoveAt(0);
-                    j++;
-                    if (j == maximumFilesPerCpu) break;
+                    if (j++ == maximumFilesPerCpu) break;
                 }
 
                 // Define the action that will be associated to each of the tasks
-                tasks[i] = new Task<List<string>>(delegate
-                {
-                    if (files.Count > 0)
-                        return SearchFileWithCharSequence(files, charSequence);
-                    return null;
-                });
+                tasks[i] = new Task<List<string>>(
+                    () => files.Count > 0 ? SearchFileWithCharSequence(files, charSequence) : null);
                 tasks[i].Start();
             }
 
@@ -109,10 +100,10 @@ namespace FileSearchTPL
             // Process the result (the tasks have already finished their work!)
             foreach (var task in tasks)
             {
-                List<string> res = task.AsyncState as List<string>;
-                if (res != null && res.Count>0)
+                List<string> partialResult = task.Result;
+                if (partialResult != null && partialResult.Count > 0)
                 {
-                    result.AddRange(res);
+                    result.AddRange(partialResult);
                 }
             }
 
@@ -169,7 +160,6 @@ namespace FileSearchTPL
                         return;
                     }
                     fs.BeginRead(buffer, 0, 1, callback, 0); // Enviar AsyncState = 0 (para que a nova comparacao comece no idx 0 da sequencia de chars)
-                    return;
                 };
 
                 // Começar a leitura... Lendo 1 byte de cada vez
