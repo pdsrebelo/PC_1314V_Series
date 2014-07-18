@@ -19,7 +19,7 @@ namespace FileSearchApp
         pesquisa, o número de ficheiros encontrados com a extensão especificada e o número total de ficheiros 
         encontrados.*/
 
-        internal class FileSearchResult
+        public class FileSearchResult
         {
             public int _totalFilesFound { get; private set; }
             public int _totalFilesWithValidExtension { get; private set; }
@@ -42,7 +42,7 @@ namespace FileSearchApp
                 return;
             }
             
-            FileSearchResult result = startSearch(args);
+            FileSearchResult result = startSearch(args[0],args[1],args[2], Console.Out);
             
             Console.WriteLine("\n\n ~ ~ ~ RESULTS ~ ~ ~ ");
             Console.WriteLine("\nTotal Files in Directory " + args[0] + " = " + result._totalFilesFound);
@@ -61,12 +61,9 @@ namespace FileSearchApp
         //  - searchable files extension    // args[2]
         //  - char sequence to search       // args[3]
 
-        public static FileSearchResult startSearch(String[] args)
+        public static FileSearchResult startSearch(string searchRoot, string fileExtension, string charSequence, TextWriter writer)
         {
-            // Call the method
-            string searchRoot = args[0], fileExtension = args[1], charSequence = args[2];
             var finalResult = new List<string>();
-
             var result = new List<string>();
             int nCPU = Environment.ProcessorCount;
             
@@ -97,7 +94,8 @@ namespace FileSearchApp
                 }
 
                 // Define the action that will be associated to each of the tasks
-                tasks[i] = Task<List<string>>.Factory.StartNew(() => files.Count > 0 ? SearchFileWithCharSequence(files, charSequence) : new List<string>());
+                tasks[i] = Task<List<string>>.Factory.StartNew(() => files.Count > 0 ? 
+                    SearchFileWithCharSequence(files, charSequence, writer) : new List<string>());
             }
 
             Task.WaitAll(tasks);
@@ -118,15 +116,15 @@ namespace FileSearchApp
             return new FileSearchResult(allFiles, allFilesWithExt, finalResult);
         }
 
-        private static List<string> SearchFileWithCharSequence(List<string> fileNames, string charSequence)
+        private static List<string> SearchFileWithCharSequence(List<string> fileNames, string charSequence, TextWriter writer)
         {
 
-            Console.WriteLine("<Called SearchFileWithCharSequence>");
+            writer.WriteLine("<Called SearchFileWithCharSequence>");//Console.WriteLine("<Called SearchFileWithCharSequence>");
             List<string> res = new List<string>();
 
             foreach (var file in fileNames)
             {
-                Console.WriteLine(String.Format("Opening file {0} for reading...", file));
+                writer.WriteLine(String.Format("Opening file {0} for reading...", file));//Console.WriteLine(String.Format("Opening file {0} for reading...", file));
                 var fs = File.OpenRead(file);
                 var buffer = new byte[1]; // 1 byte de cada vez
                 AsyncCallback callback = null;
@@ -136,7 +134,7 @@ namespace FileSearchApp
                     int nBytesRead = fs.EndRead(r);
                     if (nBytesRead == 0)
                     {
-                        Console.WriteLine("\nEnded reading file " + file);
+                        writer.WriteLine("\nEnded reading file " + file);//Console.WriteLine("\nEnded reading file " + file);
                         return;
                     }
                     int charSequenceIdx = (int)r.AsyncState;
@@ -145,8 +143,8 @@ namespace FileSearchApp
                         charSequenceIdx++;
                         if (charSequenceIdx == charSequence.Length)
                         {
-                            Console.WriteLine("\nEnded reading file " + file);
-                            Console.WriteLine("\n~ ~ ~ ~ ~> Found a File with the sequence = " + file);
+                            writer.WriteLine("\nEnded reading file " + file);//Console.WriteLine("\nEnded reading file " + file);
+                            writer.WriteLine("\n~ ~ ~ ~ ~> Found a File with the sequence = " + file);//Console.WriteLine("\n~ ~ ~ ~ ~> Found a File with the sequence = " + file);
                             res.Add(file);
                             return;
                         }

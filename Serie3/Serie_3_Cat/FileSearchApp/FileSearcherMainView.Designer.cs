@@ -1,6 +1,6 @@
 ﻿namespace FileSearchApp
 {
-    partial class Form1
+    partial class FileSearcherMainView
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.rootFolderTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.searchButton = new System.Windows.Forms.Button();
@@ -40,20 +40,20 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.fileExtensionTextBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.charSequenceTextBox = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
-            // textBox1
+            // rootFolderTextBox
             // 
-            this.textBox1.AllowDrop = true;
-            this.textBox1.Location = new System.Drawing.Point(12, 51);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(601, 20);
-            this.textBox1.TabIndex = 0;
+            this.rootFolderTextBox.AllowDrop = true;
+            this.rootFolderTextBox.Location = new System.Drawing.Point(12, 51);
+            this.rootFolderTextBox.Name = "rootFolderTextBox";
+            this.rootFolderTextBox.Size = new System.Drawing.Size(601, 20);
+            this.rootFolderTextBox.TabIndex = 0;
             // 
             // label1
             // 
@@ -165,12 +165,12 @@
             this.label6.TabIndex = 11;
             this.label6.Text = "(e.g. \"txt\", \"doc\"..)";
             // 
-            // textBox3
+            // fileExtensionTextBox
             // 
-            this.textBox3.Location = new System.Drawing.Point(632, 51);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(198, 20);
-            this.textBox3.TabIndex = 12;
+            this.fileExtensionTextBox.Location = new System.Drawing.Point(632, 51);
+            this.fileExtensionTextBox.Name = "fileExtensionTextBox";
+            this.fileExtensionTextBox.Size = new System.Drawing.Size(198, 20);
+            this.fileExtensionTextBox.TabIndex = 12;
             // 
             // label7
             // 
@@ -181,12 +181,12 @@
             this.label7.TabIndex = 13;
             this.label7.Text = "Character sequence to search";
             // 
-            // textBox4
+            // charSequenceTextBox
             // 
-            this.textBox4.Location = new System.Drawing.Point(12, 106);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(601, 20);
-            this.textBox4.TabIndex = 14;
+            this.charSequenceTextBox.Location = new System.Drawing.Point(12, 106);
+            this.charSequenceTextBox.Name = "charSequenceTextBox";
+            this.charSequenceTextBox.Size = new System.Drawing.Size(601, 20);
+            this.charSequenceTextBox.TabIndex = 14;
             // 
             // pictureBox1
             // 
@@ -203,9 +203,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(856, 385);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.textBox4);
+            this.Controls.Add(this.charSequenceTextBox);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.fileExtensionTextBox);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -217,7 +217,7 @@
             this.Controls.Add(this.searchButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.rootFolderTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "Form1";
             this.Text = "~ ~ ~ File Search ~ ~ ~";
@@ -229,7 +229,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox rootFolderTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button searchButton;
@@ -241,9 +241,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox fileExtensionTextBox;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.TextBox charSequenceTextBox;
         private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
