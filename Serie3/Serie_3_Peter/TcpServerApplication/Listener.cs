@@ -15,10 +15,10 @@ namespace TcpServerApplication
         private TcpListener _srv;
 
         /// <summary>
-        /// The amount of time to remain connected after calling 
-        /// the Socket.Close method if data remains to be sent.
+        /// The amount of time, in seconds, to remain connected after 
+        /// calling the Socket.Close method if data remains to be sent.
         /// </summary>
-        private const int LingerTime = 3; 
+        private const int LingerTime = 5; 
 
         /// <summary>
         /// TCP port number in use.

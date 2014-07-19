@@ -1,0 +1,22 @@
+﻿using System;
+using System.Windows.Forms;
+
+namespace SearchFiles
+{
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new SearchFilesForm());
+
+            // TODO: Added
+            //SearchFiles.TestSearchFiles();
+        }
+    }
+}
