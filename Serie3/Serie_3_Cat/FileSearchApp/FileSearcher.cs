@@ -19,6 +19,8 @@ namespace FileSearchApp
         pesquisa, o número de ficheiros encontrados com a extensão especificada e o número total de ficheiros 
         encontrados.*/
 
+        internal const int BUFFER_SIZE = 1024; //TODO use 
+
         public class FileSearchResult
         {
             public int _totalFilesFound { get; private set; }
