@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ClientApp.Properties {
+namespace FileSearchApp.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ClientApp.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ClientApp.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FileSearchApp.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,9 +63,9 @@ namespace ClientApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap blue_computer {
+        internal static System.Drawing.Bitmap search_blue_icon {
             get {
-                object obj = ResourceManager.GetObject("blue_computer", resourceCulture);
+                object obj = ResourceManager.GetObject("search-blue-icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

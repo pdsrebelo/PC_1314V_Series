@@ -12,10 +12,10 @@ namespace Serie_3_Cat
         public LoggerForm(Logger logger, int port)
         {
             InitializeComponent();
+            _logger = logger; 
+            _logger.SetLoggerTextBox(textBox1); 
             textBox1.Enabled = false; 
             _port = port;
-            _logger = logger;
-            _logger.SetLoggerTextBox(textBox1);
             label4.Text = _port.ToString();
         }
 

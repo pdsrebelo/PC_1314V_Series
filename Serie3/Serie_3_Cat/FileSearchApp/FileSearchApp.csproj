@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7097046C-D0EB-4AFB-BA61-AB7DC1F464C5}</ProjectGuid>
+    <ProjectGuid>{77793105-F450-47D8-80A0-9CAD9F0BFD91}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClientApp</RootNamespace>
-    <AssemblyName>ClientApp</AssemblyName>
+    <RootNamespace>FileSearchApp</RootNamespace>
+    <AssemblyName>FileSearchApp</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -35,7 +35,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Design" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,27 +45,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientConnectionForm.cs">
+    <Compile Include="FileSearcher.cs" />
+    <Compile Include="FileSearcherMainView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ClientConnectionForm.Designer.cs">
-      <DependentUpon>ClientConnectionForm.cs</DependentUpon>
+    <Compile Include="FileSearcherMainView.Designer.cs">
+      <DependentUpon>FileSearcherMainView.cs</DependentUpon>
     </Compile>
-    <Compile Include="ClientPanelForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ClientPanelForm.Designer.cs">
-      <DependentUpon>ClientPanelForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ClientConnection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="ClientConnectionForm.resx">
-      <DependentUpon>ClientConnectionForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ClientPanelForm.resx">
-      <DependentUpon>ClientPanelForm.cs</DependentUpon>
+    <Compile Include="TextBoxStreamWriter.cs" />
+    <EmbeddedResource Include="FileSearcherMainView.resx">
+      <DependentUpon>FileSearcherMainView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -92,17 +82,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serie_3_Cat\ServerApp.csproj">
-      <Project>{2F2ECB6A-C910-4EED-950D-A532A6210AF9}</Project>
-      <Name>ServerApp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ServerUtils\ServerUtils.csproj">
-      <Project>{0BA74047-8E59-4C62-A38C-8EC8EE1A949F}</Project>
-      <Name>ServerUtils</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\blue_computer.png" />
+    <None Include="Resources\search-blue-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -40,10 +40,17 @@ namespace Serie_3_Cat
 
         public void Register(IEnumerable<string> files)//, string adress, ushort port)
         {
-            //_clientSocket.ConnectAsync(_address, _port);//IPAddress.Loopback, _port);
-
-            StreamWriter output = new StreamWriter(_clientSocket.GetStream());
-
+            StreamWriter output = null;
+            try
+            {
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
+            catch (InvalidOperationException iox)
+            {
+                Reconnect();
+                MessageBox.Show(@"The Client Socket isn't connected to the server! Reconnecting...", @"ERROR");
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
             // Send request type line
             output.WriteLine("REGISTER");
 
@@ -55,15 +62,26 @@ namespace Serie_3_Cat
             output.WriteLine();
 
             output.Close();
-            //_clientSocket.Close();
         }
 
         public void Unregister(string file)//, string address, ushort port)
         {
-            //_clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
-
-            StreamWriter output = new StreamWriter(_clientSocket.GetStream());
-
+            if (file.Equals(""))
+            {
+                MessageBox.Show(@"Please insert a valid file name before selecting the 'Unregister' option!", @"ERROR");
+                return;
+            }
+            StreamWriter output = null;
+            try
+            {
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
+            catch (InvalidOperationException oex)
+            {
+                Reconnect();
+                MessageBox.Show(@"The Client Socket isn't connected to the server! Reconnecting...", @"Information");
+                output = new StreamWriter(_clientSocket.GetStream());   
+            }
             // Send request type line
             output.WriteLine("UNREGISTER");
             // Send message payload
@@ -72,15 +90,26 @@ namespace Serie_3_Cat
             output.WriteLine();
 
             output.Close();
-           // _clientSocket.Close();
+        }
+
+        private void Reconnect()
+        {
+            _clientSocket = new TcpClient(_address,_port);
         }
 
         public void ListFiles()
         {
-           // _clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
-
-            StreamWriter output = new StreamWriter(_clientSocket.GetStream());
-
+            StreamWriter output = null;
+            try
+            {
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
+            catch (InvalidOperationException iex)
+            {
+                Reconnect(); 
+                MessageBox.Show(@"The Client Socket isn't connected to the server! Reconnecting...", @"ERROR");
+                output = new StreamWriter(_clientSocket.GetStream());
+            }
             // Send request type line
             output.WriteLine("LIST_FILES");
             // Send message end mark and flush it
@@ -92,10 +121,9 @@ namespace Serie_3_Cat
             StreamReader input = new StreamReader(_clientSocket.GetStream());
             while ((line = input.ReadLine()) != null && line != string.Empty)
                 Console.WriteLine(line);
-
-            output.Close();
-          //  _clientSocket.Close();
             
+            output.Close();
+            input.Close();
         }
 
         public void CloseConnection()
@@ -105,9 +133,6 @@ namespace Serie_3_Cat
 
         public void ListLocations(string fileName)
         {
-
-            //_clientSocket.ConnectAsync(_address, _port);//(IPAddress.Loopback, _port);
-
             StreamWriter output = new StreamWriter(_clientSocket.GetStream());
 
             // Send request type line
@@ -125,8 +150,6 @@ namespace Serie_3_Cat
                 Console.WriteLine(line);
 
             output.Close();
-           // _clientSocket.Close();
-            
         }
 
 

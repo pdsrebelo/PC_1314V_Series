@@ -37,6 +37,7 @@ namespace Serie_3_Cat
                 // Read message payload, terminated by an empty line. 
                 // Each payload line has the following format
                 // <filename>:<ipAddress>:<portNumber>
+                log.LogMessage("Handler - Processing REGISTER Message...");
                 string line;
                 while ((line = input.ReadLine()) != null && line != string.Empty)
                 {
@@ -53,9 +54,10 @@ namespace Serie_3_Cat
                         log.LogMessage("Handler - Invalid REGISTER message.");
                         return;
                     }
+                    
                     Store.Instance.Register(triple[0], new IPEndPoint(ipAddress, port));
                 }
-
+                log.LogMessage("Handler - REGISTER Processed Successfully!");
                 // This request message does not have a corresponding response message, hence, 
                 // nothing is sent to the client.
             }

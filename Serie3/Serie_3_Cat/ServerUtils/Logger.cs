@@ -10,12 +10,16 @@ namespace Serie_3_Cat
     {
         public DateTime StartTime { get; private set; }
         public volatile TextWriter Writer;
+        private TextBoxStreamWriter TextBoxWriter;
         private volatile int _numRequests;
-        private volatile Control _txtBox;
-        private readonly string _logFileName;//TODO
 
         public Logger() : this(Console.Out) { }
-        public Logger(string logfile) : this(new StreamWriter(new FileStream(logfile, FileMode.Append, FileAccess.Write))) { }
+
+        public Logger(string logfile)
+        {
+            _numRequests = 0;
+            Writer = new StreamWriter(new FileStream(logfile, FileMode.Append, FileAccess.Write)); 
+        } 
         public Logger(TextWriter awriter)
         {
             _numRequests = 0;
@@ -24,18 +28,18 @@ namespace Serie_3_Cat
 
         public void SetLoggerTextBox(TextBox txtBox)
         {
-            //TODO
-            //Control _txtWriterControl = new Control();
-            //ControlPersister.PersistControl(writer, _txtWriterControl);
-
-            Interlocked.Exchange(ref _txtBox, txtBox);
-            var txbxWriter = new TextBoxStreamWriter(txtBox);
-            Interlocked.Exchange(ref Writer, txbxWriter);
+            TextBoxWriter = new TextBoxStreamWriter(txtBox);
         }
 
         public void Start()
         {
             StartTime = DateTime.Now;
+
+            //LogMessage(String.Format("\n::- LOG STARTED @ {0} -::\n", StartTime));
+            if (TextBoxWriter != null)
+            {
+                TextBoxWriter.WriteLine("\n" + String.Format("::- LOG STARTED @ {0} -::", StartTime) + "\n");
+            }
             Writer.WriteLine();
             Writer.WriteLine(String.Format("::- LOG STARTED @ {0} -::", StartTime));
             Writer.WriteLine();   
@@ -43,12 +47,16 @@ namespace Serie_3_Cat
 
         public void LogMessage(string msg)
         {
-            if (_txtBox!=null && _txtBox.InvokeRequired) // Se o writer pertence a um elemento Control que está noutra thread
+            if (TextBoxWriter != null)
             {
-                _txtBox.BeginInvoke(new Action(() => LogMessage(msg)));
-                return;
+                if (TextBoxWriter.TextBox.InvokeRequired) // Se o writer pertence a um elemento Control que está noutra thread
+                {
+                    TextBoxWriter.TextBox.BeginInvoke(new Action(() => LogMessage(msg)));
+                    return;
+                }
+                TextBoxWriter.WriteLine(String.Format("{0}: {1}", DateTime.Now, msg));
             }
-            Writer.WriteLine(String.Format("{0}: {1}", DateTime.Now, msg));
+            Writer.WriteLine("{0}: {1}", DateTime.Now, msg);
         }
 
         public void IncrementRequests()
@@ -62,8 +70,13 @@ namespace Serie_3_Cat
             Writer.WriteLine();
             LogMessage(String.Format("Running for {0} second(s)", elapsed / 10000000L));
             LogMessage(String.Format("Number of request(s): {0}", _numRequests));
+
+            if (TextBoxWriter != null)
+            {
+                TextBoxWriter.WriteLine("\n" + String.Format("::- LOG STOPPED @ {0} -::", DateTime.Now) + "\n");
+            }
             Writer.WriteLine();
-            Writer.WriteLine(String.Format("::- LOG STOPPED @ {0} -::", DateTime.Now));
+            Writer.WriteLine("::- LOG STOPPED @ {0} -::", DateTime.Now);
             Writer.Close();
         }
     }
