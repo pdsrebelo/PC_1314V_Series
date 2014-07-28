@@ -6,7 +6,6 @@ namespace FileSearchApp
 {
     public partial class FileSearcherMainView : Form
     {
-        private FileSearcher _searcher;
         public FileSearcherMainView()
         {
             InitializeComponent();
@@ -26,6 +25,8 @@ namespace FileSearchApp
                 return;
             }
 
+            searchResultsTextBox.Clear();
+
             var search = FileSearcher.startSearch(rootFolder, extension, charSequenceToSearch);
 
             TextBoxStreamWriter writer = new TextBoxStreamWriter(searchResultsTextBox);
@@ -41,7 +42,6 @@ namespace FileSearchApp
             MessageBox.Show(@"Cancel button isn't working yet!", @"Warning");
             
             //TODO Use the cancellation Token to cancel the search that is in progress 
-           // FileSearcher.Cancel(_searcher);
         }
 
         private void exitButton_Click(object sender, EventArgs e)
