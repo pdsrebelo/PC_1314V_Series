@@ -14,9 +14,6 @@ namespace SearchFiles
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SearchFilesForm());
-
-            // TODO: Added
-            //SearchFiles.TestSearchFiles();
         }
     }
 }

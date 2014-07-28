@@ -32,7 +32,7 @@ namespace Serie_2.Pedro
         }
 
         /// <summary>
-        /// A operação put coloca no fim da fila o elemento passado como argumento.
+        /// A operação Put coloca no fim da fila o elemento passado como argumento.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -48,7 +48,7 @@ namespace Serie_2.Pedro
                     if (tailNext != null)
                     {
                         // Queue in intermediate state, advance tail
-                        Interlocked.CompareExchange(ref currTail, tailNext, _tail); // _tail.compareAndSet(currTail, tailNext);
+                        Interlocked.CompareExchange(ref currTail, tailNext, _tail);
                     }
                     else
                     {
@@ -56,7 +56,7 @@ namespace Serie_2.Pedro
                         if (Interlocked.CompareExchange(ref newNode, null, currTail.Next) == null)
                         {
                             // Insertion succeeded, try advancing tail
-                            Interlocked.CompareExchange(ref currTail, newNode, _tail);  // _tail.compareAndSet(currTail, newNode);
+                            Interlocked.CompareExchange(ref currTail, newNode, _tail);
                             return true;
                         }
                     }
@@ -90,7 +90,7 @@ namespace Serie_2.Pedro
                 }
             } while (true);
 
-            return _head.Item; //_head.get().item;
+            return _head.Item;
         }
 
         /// <summary>
@@ -99,9 +99,7 @@ namespace Serie_2.Pedro
         /// <returns></returns>
         public bool IsEmpty()
         {
-            if(_head == _tail)
-                return true;
-            return false;
+            return _head == _tail;
         }
     }
 }

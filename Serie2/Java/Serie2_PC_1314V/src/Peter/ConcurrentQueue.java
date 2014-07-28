@@ -23,7 +23,8 @@ public class ConcurrentQueue<T> {
 	
 	private final AtomicReference<Node<T>> head = new AtomicReference<Node<T>>(dummy);
 	private final AtomicReference<Node<T>> tail = new AtomicReference<Node<T>>(dummy);
-		
+	
+	/* A operação put coloca no fim da fila o elemento passado como argumento. */
 	public boolean put(T item) {
 		Node<T> newNode = new Node<T>(item, null);
 		while (true){
@@ -45,8 +46,7 @@ public class ConcurrentQueue<T> {
 		}
 	}
     
-    /* 	A operação tryTake retorna o elemento presente no início da fila, ou null caso 
-    	da fila estar vazia. */
+    /* 	A operação tryTake retorna o elemento presente no início da fila, ou null caso da fila estar vazia. */
     public T tryTake()
     {
     	do{											// Keep trying until Dequeue is done
@@ -74,9 +74,6 @@ public class ConcurrentQueue<T> {
     /* A operação isEmpty produz o valor booleano que indica se a fila contém elementos. */
     public boolean IsEmpty()
     {
-    	if(head.get() == tail.get())
-    		return true;
-        return false;
+    	return head.get() == tail.get();
     }
-
 }
