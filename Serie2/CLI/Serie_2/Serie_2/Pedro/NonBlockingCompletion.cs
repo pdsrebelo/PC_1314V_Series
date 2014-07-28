@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Serie_2.Pedro
 {
     /// <summary>
-    /// 
+    /// Usando as técnicas de sincronização non-blocking discutidas nas aulas teóricas, implemente 
+    /// uma versão optimizada do sincronizador Completion (cuja especificação consta no exercício 1 
+    /// da primeira série de exercícios). As optimizações devem incidir sobre a situação em que a 
+    /// operação WaitForCompletion não bloqueia a thread invocante e as situações em que as operações 
+    /// Complete, CompleteAll não têm que libertar nenhuma thread bloqueada.
     /// </summary>
+    #pragma warning disable 420
     class NonBlockingCompletion
     {
          private volatile int _permits;
@@ -17,8 +18,7 @@ namespace Serie_2.Pedro
          private volatile int _waiters;
 
          public NonBlockingCompletion(int initial){
-             if (initial > 0)
-                 _permits = initial;
+             if (initial > 0) _permits = initial;
              _isSignaled = false;
          }
 
@@ -29,8 +29,7 @@ namespace Serie_2.Pedro
              {
                  lock (this)
                  {
-                     if (_waiters > 0)
-                         Monitor.Pulse(this); 
+                     if (_waiters > 0) Monitor.Pulse(this); 
                  }
              }
          }
@@ -45,10 +44,9 @@ namespace Serie_2.Pedro
              do
              {
                  int p;
-                 if ((p = _permits) == 0)
-                     return false;
-                 if (Interlocked.CompareExchange(ref _permits, p - 1, p) == p)
-                     return true;
+                 if ((p = _permits) == 0) return false;
+                 
+                 if (Interlocked.CompareExchange(ref _permits, p - 1, p) == p) return true;
                 
                  sw.SpinOnce();
              } while (true);
@@ -68,11 +66,9 @@ namespace Serie_2.Pedro
              {
                  do
                  {
-                     if (TryCompletion())
-                         return true;
+                     if (TryCompletion()) return true;
                         
-                     if (SyncUtils.AdjustTimeout(ref lastTime, ref timeout) == 0)
-                         return false;
+                     if (SyncUtils.AdjustTimeout(ref lastTime, ref timeout) == 0) return false;
                     
                      _waiters++;
                      Thread.MemoryBarrier();
@@ -81,6 +77,7 @@ namespace Serie_2.Pedro
                          _waiters--;
                          return true;
                      }
+
                      try
                      {
                          Monitor.Wait(this, timeout);
@@ -88,8 +85,7 @@ namespace Serie_2.Pedro
                      catch (ThreadInterruptedException)
                      {
                          if (_permits > 0)
-                             Monitor.Pulse(this);
-                        
+                             Monitor.Pulse(this); 
                          throw;
                      }
                      finally
