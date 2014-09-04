@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Serie_1.Catia
@@ -28,6 +27,7 @@ namespace Serie_1.Catia
             _signaled = false;  // Starts unsignaled
         }
 
+        //
         // Bloqueia a Thread invocante até que exista uma unidade de conclusão disponível.
         // Pode terminar:   com sucesso por ter sido satisfeita a condição de bloqueiro, retornando true.
         //                  retornando false, caso o tempo máximo de espera (timeout) tenha sido atingido
@@ -75,7 +75,9 @@ namespace Serie_1.Catia
             return false;
         }
 
+        //
         // sinaliza a conclusão de uma tarefa e viabiliza a execução de uma chamada ao WaitForCompletion
+        //
         public void Complete()
         {
             lock (this)
@@ -88,8 +90,10 @@ namespace Serie_1.Catia
             }
         }
 
+        //
         // Coloca o sincronizador no estado sinalizado, permanentemente. Ou seja, são viabilizadas todas as chamadas,
         // anteriores ou posteriores, ao WaitForCompletion
+        //
         public void CompleteAll()
         {
             lock (this)
@@ -100,14 +104,9 @@ namespace Serie_1.Catia
             }
         }
 
-        public bool IsSignaled()
-        {
-            lock (this)
-            {
-                return _signaled;
-            }
-        }
-
+        //
+        // For tests only
+        //
         public int GetPermits()
         {
             lock (this)

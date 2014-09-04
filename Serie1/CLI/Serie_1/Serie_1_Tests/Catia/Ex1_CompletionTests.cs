@@ -13,7 +13,7 @@ namespace Serie_1_Tests.Catia
         //
         // To Call in before starting each test
         //
-        public void StartCompletionSynchronizer(int nPermits)
+        private void StartCompletionSynchronizer(int nPermits)
         {
             _completionSynchronizer = new Ex1Completion(nPermits);
         }

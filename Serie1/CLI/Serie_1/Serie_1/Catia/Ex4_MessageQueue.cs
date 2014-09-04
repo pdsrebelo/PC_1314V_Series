@@ -20,9 +20,9 @@ namespace Serie_1.Catia
     receptoras também são servidas por ordem de chegada. A operação Receive deve suportar 
     desistência por timeout e por cancelamento devido à interrupção de threads bloqueadas
      */
-    
 
-    class Ex4MessageQueue<T>
+
+    public class Ex4MessageQueue<T>
     {
         public class Message<T>
         {
