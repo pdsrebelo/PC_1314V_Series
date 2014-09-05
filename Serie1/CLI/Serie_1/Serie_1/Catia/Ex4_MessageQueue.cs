@@ -22,20 +22,21 @@ namespace Serie_1.Catia
      */
 
 
+    public class Message<T>
+    {
+        public int Type { get; set; } // Tipo da mensagem: inteiro positivo
+        protected T Data { get; set; } // Dados (T)
+
+        public Message(int msgType, T msgData)
+        {
+            Type = msgType;
+            Data = msgData;
+        }
+    }
+
     public class Ex4MessageQueue<T>
     {
-        public class Message<T>
-        {
-            public int Type { get; set; } // Tipo da mensagem: inteiro positivo
-            protected T Data { get; set; } // Dados (T)
-
-            public Message(int msgType, T msgData)
-            {
-                Type = msgType;
-                Data = msgData;
-            }
-        }
-
+   
         private LinkedList<Message<T>> messageQueue;
         private LinkedList<bool> receivers; // bool = só porque sim... para ter uma lista com alguma coisa.
 
@@ -107,5 +108,21 @@ namespace Serie_1.Catia
             }
             return receivedMsg;
         }
+
+        //
+        // For tests only
+        //
+        public LinkedList<Message<T>> getMessageQueue()
+        {
+            return messageQueue;
+        } 
+
+        //
+        // For tests only
+        //
+        public LinkedList<bool> getReceivers()
+        {
+            return receivers;
+        } 
     }
 }

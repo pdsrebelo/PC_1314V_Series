@@ -46,7 +46,7 @@ namespace Serie_1_Tests.Catia
             // Take again a permit!
             CreateAndStartThread(WorkerThreadFunction_CompletionWaiter);
 
-            Thread.SpinWait(2000);
+            Thread.SpinWait(2500);
 
             // Number of permits will be 0 because all the given permits were taken in the end!
             Assert.AreEqual(0, _completionSynchronizer.GetPermits());
@@ -100,15 +100,9 @@ namespace Serie_1_Tests.Catia
         {
             StartCompletionSynchronizer(0);
             Thread t = CreateAndStartThread(WorkerThreadFunction_CompletionWaiter);
-            try
-            {
-                t.Interrupt();
-            }
-            catch (Exception iex)
-            {
-                Assert.IsInstanceOfType(iex, typeof (ThreadInterruptedException));
-            }
-            
+            Thread.SpinWait(1000);
+            t.Interrupt();
+            // Asserts feitos no metodo WorkerThreadFunction_CompletionWaiter
         }
 
         //
@@ -117,14 +111,24 @@ namespace Serie_1_Tests.Catia
         private void WorkerThreadFunction_CompletionWaiter()
         {
             const int timeout = 30000;
+            Exception ex = null;
+            bool success = false;
             try
             {
-                _completionSynchronizer.WaitForCompletion(timeout);
+                success = _completionSynchronizer.WaitForCompletion(timeout);
             }
-            catch (ThreadInterruptedException)
+            catch (Exception e)
             {
                 Console.WriteLine("CompletionWaiter -> Thread Was Interrupted!");
-                throw;
+                ex = e;
+            }
+            if (ex != null)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ThreadInterruptedException));
+            }
+            else
+            {
+                Assert.IsTrue(success);
             }
         }
 
