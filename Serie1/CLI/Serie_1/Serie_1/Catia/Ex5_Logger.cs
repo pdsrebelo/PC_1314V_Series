@@ -28,8 +28,9 @@ namespace Serie_1.Catia
      http://www.nunit.org/ 2
      * 
      */    
-    class Ex5Logger
+    public class Ex5Logger
     {
+        private String LOGGER_SHUTDOWN_EXCEPTION_MSG = "LOGGER IS SHUTDOWN";
         enum LoggerState
         {
             SHUTDOWN = 1,
@@ -39,57 +40,78 @@ namespace Serie_1.Catia
 
         private class MsgSenderThread
         {
-            public int ThreadId { get; set; }
             public string Msg { get; set; }
+            public bool Processed { get; set; }
 
             public MsgSenderThread(int tId, string m)
             {
                 Msg = m;
-                ThreadId = tId;
+                Processed = false;
             }
         }
 
-        private LinkedList<String> messagesToWrite; 
+        private volatile LinkedList<MsgSenderThread> messagesToWrite; 
         private LoggerState _state;
         private Thread _loggerThread; 
-        private readonly TextWriter _writer;
+        private volatile TextWriter _writer;
 
-        public Ex5Logger(TextWriter writer, LinkedList<string> messagesToWrite)
+        public Ex5Logger(TextWriter writer)
         {
+            messagesToWrite = new LinkedList<MsgSenderThread>();
             _state = LoggerState.NOT_ACTIVE;
             _writer = writer;
-            this.messagesToWrite = messagesToWrite;
-            _loggerThread.Priority = ThreadPriority.Lowest;
+        }
+
+        public String getStatus()
+        {
+            lock (this)
+            {
+                return _state.ToString();
+            }
         }
 
         public void LogMessage(string msg) // Recebe mensagem com relatório
         {
             lock (this)
             {
-                if (_state == LoggerState.SHUTDOWN) throw new Exception("LOGGER IS SHUTDOWN");
-                if(_state == LoggerState.NOT_ACTIVE) Start();
-                _loggerThread.Start(new MsgSenderThread(Thread.CurrentThread.ManagedThreadId,msg)); 
+                if (_state == LoggerState.SHUTDOWN) throw new Exception(LOGGER_SHUTDOWN_EXCEPTION_MSG);
+                if (_state == LoggerState.NOT_ACTIVE) Start();
+
+                MsgSenderThread node = new MsgSenderThread(Thread.CurrentThread.ManagedThreadId, msg);
+                messagesToWrite.AddLast(node);
+                Monitor.Pulse(this);
+
+                while(true){
+                    if (node.Processed)
+                    {
+                        messagesToWrite.Remove(node);
+                        return;
+                    }
+                    Monitor.Wait(this);
+                }
             }          
         }
 
-        void Start()
-        {   
-            _loggerThread = new Thread((msgSenderThread) =>
+        public void Start()
+        {
+   
+            _loggerThread = new Thread( () =>
             {
                 lock (this)
                 {
                     if (_state == LoggerState.NOT_ACTIVE)
                         _state = LoggerState.ACTIVE;
-
-                    
-                    messagesToWrite.AddLast(((MsgSenderThread)msgSenderThread).Msg);
-
                     do
                     {
-                        if (messagesToWrite.First == msgSenderThread)
+                        if (messagesToWrite.Count>0)
                         {
-                            _writer.WriteLine(msgSenderThread);
-                            messagesToWrite.Remove(((MsgSenderThread) msgSenderThread).Msg);
+                            foreach(MsgSenderThread msgNode in messagesToWrite){
+                                if(!msgNode.Processed){            
+                                    _writer.WriteLine(msgNode.Msg);
+                                    msgNode.Processed = true;
+                                    Monitor.PulseAll(this); // Notificar threads, para elas verem se a sua msg ja foi escrita no ficheiro
+                                }
+                            }
                         }
                         try
                         {
@@ -97,30 +119,35 @@ namespace Serie_1.Catia
                         }
                         catch (ThreadInterruptedException iex)
                         {
-                            messagesToWrite.Remove(((MsgSenderThread)msgSenderThread).Msg);
+                            foreach (MsgSenderThread msg in messagesToWrite)
+                                messagesToWrite.Remove(msg);
                             Monitor.PulseAll(this);
-                            //TODO 
                         }
-
+                        
                     } while (true);
                 }
             });
+            _loggerThread.Priority = ThreadPriority.Lowest;
             _state = LoggerState.ACTIVE;
+            _loggerThread.Start();
         }
 
         public void Shutdown()
         {
             lock (this)
             {
-                if (_state == LoggerState.SHUTDOWN) return;
+                if (_state == LoggerState.SHUTDOWN) 
+                    return;
 
                 _state = LoggerState.SHUTDOWN;
-
                 do
                 {
                     // Esperar pelo fim de todas as escritas 
                     if (messagesToWrite.Count == 0)
+                    {
+                        _writer.Close();
                         return;
+                    }
                     try
                     {
                         Monitor.Wait(this);

@@ -35,12 +35,10 @@ namespace Serie_1_Tests.Catia
             InitializeMessageQueue();
 
             CreateAndStartThread(MessageSender);
-            CreateAndStartThread(MessageSender);
-            CreateAndStartThread(MessageSender);
 
-            Thread.SpinWait(4000);
+            Thread.Sleep(500);
 
-            Assert.AreEqual(3, _messageQueue.getMessageQueue().Count);
+            Assert.IsTrue(_messageQueue.getMessageQueue().Count > 0);
         }
 
         [TestMethod]
@@ -70,7 +68,7 @@ namespace Serie_1_Tests.Catia
         {
             InitializeMessageQueue();
             var thread = CreateAndStartThread(MessageReceiver);
-            Thread.SpinWait(1000);
+            Thread.SpinWait(2000);
             thread.Interrupt();
 
             // Verify if the receivers' list is empty (there was only this receiver)
@@ -84,7 +82,7 @@ namespace Serie_1_Tests.Catia
         {
             InitializeMessageQueue();
             CreateAndStartThread(MessageSender);
-            Thread.SpinWait(2000); 
+            Thread.Sleep(200); 
             var msg = _messageQueue.Receive(8000, (i => i < 20 && i > 0));
             Assert.IsTrue(msg.Type<20 && msg.Type>0);
             Assert.AreEqual(0, _messageQueue.getReceivers().Count);

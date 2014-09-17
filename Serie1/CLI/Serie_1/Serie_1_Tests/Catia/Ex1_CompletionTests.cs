@@ -46,8 +46,8 @@ namespace Serie_1_Tests.Catia
             // Take again a permit!
             CreateAndStartThread(WorkerThreadFunction_CompletionWaiter);
 
-            Thread.SpinWait(2500);
-
+            
+            Thread.Sleep(1000);
             // Number of permits will be 0 because all the given permits were taken in the end!
             Assert.AreEqual(0, _completionSynchronizer.GetPermits());
         
@@ -87,7 +87,7 @@ namespace Serie_1_Tests.Catia
 
             // Another waiter thread:
             Assert.IsTrue(_completionSynchronizer.WaitForCompletion(1000));
-            Thread.SpinWait(2000);
+            Thread.Sleep(2000);
 
             // Another waiter: will wait but won't get a permit
             Assert.IsFalse(_completionSynchronizer.WaitForCompletion(100));

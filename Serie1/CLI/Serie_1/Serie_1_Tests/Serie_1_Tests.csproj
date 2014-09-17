@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Catia\Ex1_CompletionTests.cs" />
     <Compile Include="Catia\Ex4_MessageQueueTests.cs" />
+    <Compile Include="Catia\Ex5_LoggerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
