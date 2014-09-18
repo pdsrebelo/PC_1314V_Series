@@ -64,17 +64,23 @@ public class Ex2_TestSynchronousQueue {
 	}
 	
 	@Test
-	public void Ex2_TestFIFO() throws InterruptedException{
+	public void Ex2_TestObjectsQueue() throws InterruptedException{
 		String value1 = "prod1", value2 = "prod2", value3 = "prod3";
 		ProducerThread<String>prod1 = new ProducerThread<>(_queue, value1);
 		prod1.start();
+		Thread.sleep(100);
+		
 		ProducerThread<String>prod2 = new ProducerThread<>(_queue, value2);
 		prod2.start();
+		Thread.sleep(100);
+		
 		ProducerThread<String>prod3 = new ProducerThread<>(_queue, value3);
 		prod3.start();
+		Thread.sleep(100);
 		
 		_consumerThread.start();
-		Thread.sleep(100);
+		Thread.sleep(1000);
+		
 		String taken = _consumerThread.getConsumedObject();
 		Assert.assertEquals(value1, taken);
 		
@@ -93,4 +99,47 @@ public class Ex2_TestSynchronousQueue {
 		Assert.assertEquals(0, _queue.getNumberOfElements());
 	}
 
+	@Test
+	public void Ex2_TestConsumerThreadQueue() throws InterruptedException{
+		
+		int nThreads = 0, totalThreads = nThreads + 2;
+	
+		// Save the ref to the first two created threads
+		ConsumerThread<String>firstThread = new ConsumerThread<>(_queue);
+		firstThread.start();
+		Thread.sleep(50);
+		ConsumerThread<String>secondThread = new ConsumerThread<>(_queue);
+		secondThread.start();
+		
+		// Create a bunch of other consumer threads...
+		for(int i=0; i<nThreads; i++){
+			new ConsumerThread<>(_queue).start();
+			Thread.sleep(10);
+		}
+		Thread.sleep(150);
+		
+		// Offer 2 objects to be consumed by the threads who's refs are saved (the first two)
+		String valueForThread1 = "valor 1 para thread 1";
+		String valueForThread2 = "valor a receber pela segunda thread";
+		
+		ProducerThread<String>producer1 = new ProducerThread<String>(_queue, valueForThread1);
+		ProducerThread<String>producer2 = new ProducerThread<String>(_queue, valueForThread2);
+		
+		Assert.assertEquals(totalThreads, _queue.getNumberOfConsumerThreads());
+		
+		producer1.start();
+		Thread.sleep(50);
+		producer2.start();
+
+		Thread.sleep(500);
+		
+		String valueReceivedByThread1 = null, valueReceivedByThread2 = null;
+		valueReceivedByThread1 = firstThread.getConsumedObject();
+		
+		Thread.sleep(1000);
+
+		valueReceivedByThread2 = secondThread.getConsumedObject();
+		Assert.assertEquals(valueForThread1, valueReceivedByThread1);
+		Assert.assertEquals(valueForThread2, valueReceivedByThread2);
+	}
 }

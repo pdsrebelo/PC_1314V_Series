@@ -24,8 +24,8 @@ import java.util.LinkedList;
 public class Ex2_SynchronousQueue <T> {
 
 	// FIFO Queues:
-	private LinkedList<Long> consumerThreads;
-	private LinkedList<T> objectsProduced;
+	private volatile LinkedList<Long> consumerThreads;
+	private volatile LinkedList<T> objectsProduced;
 	
 	public Ex2_SynchronousQueue(){
 		objectsProduced = new LinkedList<T>();
@@ -40,7 +40,7 @@ public class Ex2_SynchronousQueue <T> {
 		long tId = Thread.currentThread().getId();
 		consumerThreads.addLast(tId);
 		
-		if(!objectsProduced.isEmpty() && consumerThreads.getFirst().equals(tId)){	
+		if(!objectsProduced.isEmpty() && consumerThreads.getFirst().longValue() == tId){	
 			takenObject = objectsProduced.removeFirst();
 			consumerThreads.removeFirst();
 			notifyAll();
@@ -59,16 +59,16 @@ public class Ex2_SynchronousQueue <T> {
 				}
 			}			
 			if(!objectsProduced.isEmpty()){
-				if(consumerThreads.getFirst().equals(tId))
+				if(consumerThreads.getFirst().longValue() == tId)
 				{
 					consumerThreads.removeFirst();
 					takenObject = objectsProduced.removeFirst();
-					notifyAll();
 					break;
 				}
 			}
 		}while(true);
 		
+		notifyAll();
 		return takenObject;
 	}
 	
@@ -76,7 +76,14 @@ public class Ex2_SynchronousQueue <T> {
 	// thread consumidora disponível para o receber.
 	
 	public synchronized void put(T obj) throws InterruptedException{
+	
 		objectsProduced.addLast(obj);
+		
+		if(objectsProduced.getFirst() == obj && !consumerThreads.isEmpty()){
+			notifyAll();
+			return;
+		}
+		
 		do{
 			if(consumerThreads.isEmpty()){
 				try{
@@ -84,19 +91,24 @@ public class Ex2_SynchronousQueue <T> {
 				}catch(InterruptedException iex){
 					if(objectsProduced.contains(obj))
 						objectsProduced.remove(obj);
+					if(!consumerThreads.isEmpty())
+						notifyAll();
 					throw iex;
 				}
 			}
-			if(!consumerThreads.isEmpty()){
-				if(objectsProduced.getFirst().equals(obj)){
-					break;
-				}
+			if(!consumerThreads.isEmpty() && objectsProduced.getFirst().equals(obj)){
+				// Notificar threads em espera que este objecto está à cabeça
+				notifyAll();
+				return;
 			}
 		}while(true);
-		notifyAll();
 	}
 
 	public synchronized int getNumberOfElements() {
 		return objectsProduced.size();
+	}
+
+	public synchronized int getNumberOfConsumerThreads() {
+		return consumerThreads.size();
 	}
 }
