@@ -45,32 +45,39 @@ namespace Serie_1.Catia
                 do
                 {
                     // Verificar estado do pedido
-                    if (request.IsBeingProcessed && !request.Response.Equals(default(TR)))//TODO Se tem lá alguma coisa
+                    if (request.IsBeingProcessed)
                     {
-                        // Pedido já foi atendido e já há resposta!
-                        response = request.Response;
-                        success = true;
-                        break;
-                    }
-                    
-                    try
-                    {
-                        SyncUtils.Wait(this, request); // Em vez de "Monitor.Wait(request);"
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                        // Verificar se o pedido foi concluído, apesar da interrupção
-                        if (request.IsBeingProcessed && !request.Response.Equals(default(TR))) // TODO - Ver se "request" tem alguma coisa
+                        if (request.Response != null)//TODO Se tem lá alguma coisa
                         {
-                            // Se já foi atendido e já há resposta, retornar como sucesso
+                            // Pedido já foi atendido e já há resposta!
                             response = request.Response;
-                            return true;
+                            // tirar o pedido da fila
+                            _clientServiceRequests.Remove(request);
+                            success = true;
+                            break;
                         }
-                        // Senão, remover
-                        _clientServiceRequests.Remove(request);
-                        throw;
+
+                        try
+                        {
+                            SyncUtils.Wait(this, request); // Em vez de "Monitor.Wait(request);"
+                        }
+                        catch (ThreadInterruptedException)
+                        {
+                            // Verificar se o pedido foi concluído, apesar da interrupção
+                            if (request.IsBeingProcessed && request.Response!=null) // TODO - Ver se "request" tem alguma coisa
+                            {
+                                // Se já foi atendido e já há resposta, retornar como sucesso
+                                response = request.Response;
+                                return true;
+                            }
+                            // Senão, remover
+                            _clientServiceRequests.Remove(request);
+                            throw;
+                        }
                     }
-                } while ((timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout))>0);
+                    timeout = SyncUtils.AdjustTimeout(ref lastTime, ref timeout);
+                    Console.WriteLine("timeout = "+timeout);
+                } while (timeout>0);
             }
             return success;
         }
@@ -126,6 +133,17 @@ namespace Serie_1.Catia
             {
                 ((ClientRequest) rendezVousToken).Response = response;
                 SyncUtils.Notify(this, rendezVousToken);
+            }
+        }
+
+        //
+        // Para testes
+        //
+        public int getNumberOfRequests()
+        {
+            lock (this)
+            {
+                return _clientServiceRequests.Count;
             }
         }
     }

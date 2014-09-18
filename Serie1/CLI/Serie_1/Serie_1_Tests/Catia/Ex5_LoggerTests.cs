@@ -4,6 +4,7 @@ using Serie_1.Catia;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
+using Serie_1_Tests.Catia;
 
 namespace Serie_1_Tests.Catia{
 
@@ -11,25 +12,12 @@ namespace Serie_1_Tests.Catia{
     public class Ex5LoggerTests
     {
         private String DEFAULT_LOG_MSG = "This is a log message for tests!";
-        private String filename = "test1.txt";
         private static Ex5Logger logger;
 
-        private void InitializeLogger()
+        private void InitializeLogger(String filename)
         {
-
             TextWriter writer = File.CreateText(filename);
             logger = new Ex5Logger(writer);
-      
-        }
-
-        //
-        // To Create a Thread
-        //
-        private static Thread CreateAndStartThread(ThreadStart func)
-        {
-            var thread = new Thread(func);
-            thread.Start();
-            return thread;
         }
 
         public void LogMessageFunction()
@@ -39,12 +27,12 @@ namespace Serie_1_Tests.Catia{
         }
 
         [TestMethod]
-        public void LogMessage_ShutdownSuccessfully()
+        public void Ex5_LogMessage_ShutdownSuccessfully()
         {
-            InitializeLogger();
+            InitializeLogger("LogMessage_ShutdownSuccessfully");
             logger.Start();
 
-            Thread loggerThread = CreateAndStartThread(LogMessageFunction);
+            Thread loggerThread = TestUtils.CreateAndStartThread(LogMessageFunction);
 
             Thread.Sleep(800);
             logger.Shutdown();
@@ -53,10 +41,10 @@ namespace Serie_1_Tests.Catia{
         }
 
         [TestMethod]
-        public void LogMessage_Unsuccessful_DueToLogAfterShutdown()
+        public void Ex5_LogMessage_Unsuccessful_DueToLogAfterShutdown()
         {
             bool exceptionOccurred = false;
-            InitializeLogger();
+            InitializeLogger("LogMessage_Unsuccessful_DueToLogAfterShutdown");
             logger.Start();
             logger.Shutdown();
             try
@@ -71,9 +59,10 @@ namespace Serie_1_Tests.Catia{
         }
 
         [TestMethod]
-        public void LogMessage_SuccessfulLogMessageWritten()
+        public void Ex5_LogMessage_SuccessfulLogMessageWritten()
         {
-            InitializeLogger();
+            String filename = "LogMessage_SuccessfulLogMessageWritten.txt";
+            InitializeLogger(filename);
             
             logger.Start();
             
@@ -85,7 +74,7 @@ namespace Serie_1_Tests.Catia{
 
             string line = "";
             // Ler o que foi escrito no ficheiro
-            using (TextReader reader = File.OpenText(@filename))
+            using (TextReader reader = File.OpenText(filename))
             {
                 line = reader.ReadLine();
             }
@@ -93,16 +82,17 @@ namespace Serie_1_Tests.Catia{
         }
 
         [TestMethod]
-        public void LogMessage_SuccessfullyWritesTwoLogMessages()
+        public void Ex5_LogMessage_SuccessfullyWritesTwoLogMessages()
         {
-            InitializeLogger();
+            String filename = "LogMessage_SuccessfullyWritesTwoLogMessages.txt";
+            InitializeLogger(filename);
 
             String msg1 = "TESTE ESCRITA EM FICHEIRO - USANDO O LOGGER!"
                 , msg2 = DEFAULT_LOG_MSG, msg3 = DEFAULT_LOG_MSG;
             logger.LogMessage(msg1);
 
-            CreateAndStartThread(LogMessageFunction);
-            CreateAndStartThread(LogMessageFunction);
+            TestUtils.CreateAndStartThread(LogMessageFunction);
+            TestUtils.CreateAndStartThread(LogMessageFunction);
 
             Thread.Sleep(1000);
 
@@ -122,9 +112,10 @@ namespace Serie_1_Tests.Catia{
         }
 
         [TestMethod]
-        public void LogMessage_SuccessfullyWritesElevenLogMessages()
+        public void Ex5_LogMessage_SuccessfullyWritesElevenLogMessages()
         {
-            InitializeLogger();
+            String filename = "LogMessage_SuccessfullyWritesElevenLogMessages.txt";
+            InitializeLogger(filename);
 
             int totalLogMsgThreads = 10;
             String msg1 = "TESTE ESCRITA EM FICHEIRO - USANDO O LOGGER!... This Will write 11 log messages (total)!";
@@ -132,7 +123,7 @@ namespace Serie_1_Tests.Catia{
 
             for (int j = 0; j < totalLogMsgThreads; j++)
             {
-                CreateAndStartThread(LogMessageFunction);
+                TestUtils.CreateAndStartThread(LogMessageFunction);
             }
 
             // Make sure all the log message requests are received before shutting down

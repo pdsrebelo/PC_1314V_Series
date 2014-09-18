@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Serie_1.Catia;
+using Serie_1_Tests.Catia;
 
 namespace Serie_1_Tests.Catia
 {
@@ -14,27 +15,18 @@ namespace Serie_1_Tests.Catia
         //
         // Initialize the MessageQueue
         //
+        
         private static void InitializeMessageQueue()
         {
             _messageQueue = new Ex4MessageQueue<string>();
         }
 
-        //
-        // To Create a Thread
-        //
-        private static Thread CreateAndStartThread(ThreadStart func)
-        {
-            var thread = new Thread(func);
-            thread.Start();
-            return thread;
-        }
-
         [TestMethod]
-        public void SendTest()
+        public void Ex4_SendTest()
         {
             InitializeMessageQueue();
 
-            CreateAndStartThread(MessageSender);
+            TestUtils.CreateAndStartThread(MessageSender);
 
             Thread.Sleep(500);
 
@@ -42,21 +34,21 @@ namespace Serie_1_Tests.Catia
         }
 
         [TestMethod]
-        public void ReceiveTest_TimedOut()
+        public void Ex4_ReceiveTest_TimedOut()
         {
             InitializeMessageQueue();
-            CreateAndStartThread(MessageSender);
-            CreateAndStartThread(MessageSender);
-            CreateAndStartThread(MessageSender);
+            for (int i = 0; i < 3;i++ )
+                TestUtils.CreateAndStartThread(MessageSender);
+
             Assert.IsNull(_messageQueue.Receive(1000, i => i > 5000));
             Assert.AreEqual(0, _messageQueue.getReceivers().Count);
         }
 
         [TestMethod]
-        public void ReceiveTest_NoMatchForPredicate()
+        public void Ex4_ReceiveTest_NoMatchForPredicate()
         {
             InitializeMessageQueue();
-            CreateAndStartThread(MessageSender); // MessageSender method prepares a Message with type = 2
+            TestUtils.CreateAndStartThread(MessageSender); // MessageSender method prepares a Message with type = 2
             var msg = _messageQueue.Receive(5000, (i => i>5)); // We want messages with type > 5
             
             Assert.IsNull(msg);
@@ -64,10 +56,10 @@ namespace Serie_1_Tests.Catia
         }
 
         [TestMethod]
-        public void ReceiveTest_ThreadInterrupted()
+        public void Ex4_ReceiveTest_ThreadInterrupted()
         {
             InitializeMessageQueue();
-            var thread = CreateAndStartThread(MessageReceiver);
+            var thread = TestUtils.CreateAndStartThread(MessageReceiver);
             Thread.SpinWait(2000);
             thread.Interrupt();
 
@@ -78,10 +70,10 @@ namespace Serie_1_Tests.Catia
         }
 
         [TestMethod]
-        public void ReceiveTest_Successful()
+        public void Ex4_ReceiveTest_Successful()
         {
             InitializeMessageQueue();
-            CreateAndStartThread(MessageSender);
+            TestUtils.CreateAndStartThread(MessageSender);
             Thread.Sleep(200); 
             var msg = _messageQueue.Receive(8000, (i => i < 20 && i > 0));
             Assert.IsTrue(msg.Type<20 && msg.Type>0);
