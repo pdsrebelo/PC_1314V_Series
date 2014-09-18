@@ -127,7 +127,7 @@ namespace Serie_1_Tests.Catia{
             }
 
             // Make sure all the log message requests are received before shutting down
-            Thread.SpinWait(2500);
+            Thread.SpinWait(2600);
 
             logger.Shutdown();
 
