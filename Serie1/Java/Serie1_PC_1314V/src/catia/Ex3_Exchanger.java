@@ -1,4 +1,4 @@
-package Cat;
+package catia;
 
 import java.util.LinkedList;
 
