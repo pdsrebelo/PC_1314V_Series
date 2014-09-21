@@ -25,7 +25,7 @@ namespace Serie_1.Pedro
             Shutdown = 2
         }
 
-        private TextWriter _myTw;
+        private readonly TextWriter _myTw;
         private LinkedList<string> _msgQueue;
         private LoggerState _state;
 

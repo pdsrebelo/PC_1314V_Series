@@ -86,7 +86,7 @@ namespace Serie_1.Pedro
                     {
                         Monitor.Wait(this, timeout);
                     }
-                    catch (ThreadInterruptedException) // TODO : Faz sentido a regeneração de excepção aqui?
+                    catch (ThreadInterruptedException)
                     {
                         _consumersQueue.Remove(myNode); // Return value: true if the element containing value is successfully removed; otherwise, false. This method also returns false if value was not found in the original LinkedList<T>.
                         Monitor.PulseAll(this);
@@ -100,6 +100,7 @@ namespace Serie_1.Pedro
                             if (selector(msg.Type)) // Existe uma mensagem com um predicado compativel comigo (aqui não faz sentido usar PulseAll)
                             {
                                 retMsg = msg;
+                                break;
                             }
                         }
                     }

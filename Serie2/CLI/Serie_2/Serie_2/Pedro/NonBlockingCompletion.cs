@@ -29,7 +29,7 @@ namespace Serie_2.Pedro
              {
                  lock (this)
                  {
-                     if (_waiters > 0) Monitor.Pulse(this); 
+                     if (_waiters > 0) Monitor.PulseAll(this); 
                  }
              }
          }
