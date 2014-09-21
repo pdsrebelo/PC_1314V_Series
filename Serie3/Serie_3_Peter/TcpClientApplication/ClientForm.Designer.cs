@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.Register = new System.Windows.Forms.Button();
+            this.RegisterFile = new System.Windows.Forms.Button();
             this.Unregister = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.port = new System.Windows.Forms.Label();
@@ -37,6 +37,7 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.ListFile = new System.Windows.Forms.Button();
             this.Stop = new System.Windows.Forms.Button();
+            this.RegisteredFilesListBox = new System.Windows.Forms.CheckedListBox();
             this.SuspendLayout();
             // 
             // textBox1
@@ -49,15 +50,15 @@
             this.textBox1.Size = new System.Drawing.Size(653, 280);
             this.textBox1.TabIndex = 6;
             // 
-            // Register
+            // RegisterFile
             // 
-            this.Register.Location = new System.Drawing.Point(51, 371);
-            this.Register.Name = "Register";
-            this.Register.Size = new System.Drawing.Size(168, 55);
-            this.Register.TabIndex = 8;
-            this.Register.Text = "Register";
-            this.Register.UseVisualStyleBackColor = true;
-            this.Register.Click += new System.EventHandler(this.Register_Click);
+            this.RegisterFile.Location = new System.Drawing.Point(51, 371);
+            this.RegisterFile.Name = "RegisterFile";
+            this.RegisterFile.Size = new System.Drawing.Size(168, 55);
+            this.RegisterFile.TabIndex = 8;
+            this.RegisterFile.Text = "Register File";
+            this.RegisterFile.UseVisualStyleBackColor = true;
+            this.RegisterFile.Click += new System.EventHandler(this.RegisterFile_Click);
             // 
             // Unregister
             // 
@@ -123,11 +124,20 @@
             this.Stop.UseVisualStyleBackColor = true;
             this.Stop.Click += new System.EventHandler(this.Stop_Click);
             // 
+            // RegisteredFilesListBox
+            // 
+            this.RegisteredFilesListBox.FormattingEnabled = true;
+            this.RegisteredFilesListBox.Location = new System.Drawing.Point(26, 527);
+            this.RegisteredFilesListBox.Name = "RegisteredFilesListBox";
+            this.RegisteredFilesListBox.Size = new System.Drawing.Size(639, 238);
+            this.RegisteredFilesListBox.TabIndex = 17;
+            // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(677, 513);
+            this.ClientSize = new System.Drawing.Size(685, 787);
+            this.Controls.Add(this.RegisteredFilesListBox);
             this.Controls.Add(this.Stop);
             this.Controls.Add(this.ListFile);
             this.Controls.Add(this.textBox2);
@@ -135,7 +145,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.port);
             this.Controls.Add(this.Unregister);
-            this.Controls.Add(this.Register);
+            this.Controls.Add(this.RegisterFile);
             this.Controls.Add(this.textBox1);
             this.Name = "ClientForm";
             this.Text = "ClientForm";
@@ -147,7 +157,7 @@
         #endregion
 
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button Register;
+        private System.Windows.Forms.Button RegisterFile;
         private System.Windows.Forms.Button Unregister;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label port;
@@ -155,6 +165,7 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button ListFile;
         private System.Windows.Forms.Button Stop;
+        private System.Windows.Forms.CheckedListBox RegisteredFilesListBox;
 
     }
 }

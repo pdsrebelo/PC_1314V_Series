@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Windows.Forms;
+using System.Linq;
 using ServerClientUtils;
 
 namespace TcpClientApplication
@@ -20,16 +21,45 @@ namespace TcpClientApplication
             Show();
         }
 
-        private void Register_Click(object sender, EventArgs e)
+        private void RegisterFile_Click(object sender, EventArgs e)
         {
-            _client.Register(new[] { "xpto", "ypto", "zpto" });
+            OpenFileDialog openFileDialog1 = new OpenFileDialog
+            {
+                InitialDirectory = "c:\\",
+                Filter = @"txt files (*.txt)|*.txt|All files (*.*)|*.*",
+                FilterIndex = 2,
+                RestoreDirectory = true,
+                Multiselect = true
+            };
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    _client.Register(openFileDialog1.FileNames);
+
+                    foreach (var file in openFileDialog1.FileNames)
+                        RegisteredFilesListBox.Items.Add(file);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(@"Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+
+            //_client.Register(new[] { "xpto", "ypto", "zpto" });
         }
 
         private void Unregister_Click(object sender, EventArgs e)
         {
-            _client.Unregister("zpto");
-            _client.Unregister("xpto");
-            _client.Unregister("ypto");
+            foreach (var item in RegisteredFilesListBox.CheckedItems.OfType<string>().ToList())
+            {
+                // Unregister the file in the server
+                _client.Unregister(item);
+
+                // Remove it from the list of registered files
+                RegisteredFilesListBox.Items.Remove(item);
+            }
         }
 
         private void ListAllFiles_Click(object sender, EventArgs e)
