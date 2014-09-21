@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace Serie_1
+namespace Serie_1.Catia
 {
     /*
      * 1.   Usando monitores intrínsecos CLI, implemente o sincronizador Completion, que representa um 
@@ -19,25 +15,27 @@ namespace Serie_1
             sinalizado, ou seja, são viabilizadas todas as chamadas, anteriores ou posteriores, ao método 
             WaitForCompletion
      * */
-    class Ex1Completion
+
+    public class Ex1Completion
     {
         private bool _signaled;
         private int _permits;
 
-        public Ex1Completion(int permits, bool signaled)
+        public Ex1Completion(int permits)
         {
             if (permits > 0) _permits = permits;
             _signaled = false;  // Starts unsignaled
         }
 
+        //
         // Bloqueia a Thread invocante até que exista uma unidade de conclusão disponível.
         // Pode terminar:   com sucesso por ter sido satisfeita a condição de bloqueiro, retornando true.
-          //                retornando false, caso o tempo máximo de espera (timeout) tenha sido atingido
+        //                  retornando false, caso o tempo máximo de espera (timeout) tenha sido atingido
         public bool WaitForCompletion(int timeout)
         {
             lock (this)
             {
-                if (_signaled)      // Signaled to please all
+                if (_signaled)      // Signaled to complete all
                     return true;
 
                 if (timeout == 0)   // Timeout
@@ -49,22 +47,22 @@ namespace Serie_1
                     return true;
                 }
 
-                int initialTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
+                var initialTime = (timeout != Timeout.Infinite) ? Environment.TickCount : 0; // Get the current time
                 do
                 {
-                    try  // Wait for more permits...
+                    try  // Wait for permits to be available...
                     {
                         Monitor.Wait(this, timeout);
                     }
-                    catch (ThreadInterruptedException iex)
+                    catch (ThreadInterruptedException)
                     {
-                        if(_permits >= 1)   // If there were enough permits, "Pulse", so that another Thread will have the chance to "Acquire"!
+                        if(_signaled || _permits >= 1)   // If there were enough permits, "Pulse", so that another Thread will have the chance to "Acquire"!
                             Monitor.Pulse(this);
 
                         throw;  // Rethrow the exception
                     }
 
-                    if (_signaled || _permits >= 1)  // Verify if there are enough permits to "Acquire" or if it's Signaled to please all
+                    if (_signaled || _permits >= 1)  // Verify if there are enough permits to "Acquire" or if it's Signaled to complete all
                     {
                         _permits--;
                         return true;
@@ -77,18 +75,13 @@ namespace Serie_1
             return false;
         }
 
+        //
         // sinaliza a conclusão de uma tarefa e viabiliza a execução de uma chamada ao WaitForCompletion
+        //
         public void Complete()
         {
             lock (this)
             {
-//                // If "signaled" then we don't need to count the permits - We notify all the threads!
-//                if (_signaled)
-//                {
-//                    Monitor.PulseAll(this);
-//                    return;
-//                }
-
                 // A Task was concluded, so we have another permit available!
                 _permits++;
                 
@@ -97,8 +90,10 @@ namespace Serie_1
             }
         }
 
+        //
         // Coloca o sincronizador no estado sinalizado, permanentemente. Ou seja, são viabilizadas todas as chamadas,
         // anteriores ou posteriores, ao WaitForCompletion
+        //
         public void CompleteAll()
         {
             lock (this)
@@ -106,6 +101,17 @@ namespace Serie_1
                 // Put the synchronizer in "signaled" state and notify all the waiting threads!
                 _signaled = true;
                 Monitor.PulseAll(this);
+            }
+        }
+
+        //
+        // For tests only
+        //
+        public int GetPermits()
+        {
+            lock (this)
+            {
+                return _permits;
             }
         }
     }

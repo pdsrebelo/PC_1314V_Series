@@ -20,22 +20,23 @@ namespace Serie_1.Catia
     receptoras também são servidas por ordem de chegada. A operação Receive deve suportar 
     desistência por timeout e por cancelamento devido à interrupção de threads bloqueadas
      */
-    
 
-    class Ex4MessageQueue<T>
+
+    public class Message<T>
     {
-        public class Message<T>
+        public int Type { get; set; } // Tipo da mensagem: inteiro positivo
+        protected T Data { get; set; } // Dados (T)
+
+        public Message(int msgType, T msgData)
         {
-            public int Type { get; set; } // Tipo da mensagem: inteiro positivo
-            protected T Data { get; set; } // Dados (T)
-
-            public Message(int msgType, T msgData)
-            {
-                Type = msgType;
-                Data = msgData;
-            }
+            Type = msgType;
+            Data = msgData;
         }
+    }
 
+    public class Ex4MessageQueue<T>
+    {
+   
         private LinkedList<Message<T>> messageQueue;
         private LinkedList<bool> receivers; // bool = só porque sim... para ter uma lista com alguma coisa.
 
@@ -107,5 +108,21 @@ namespace Serie_1.Catia
             }
             return receivedMsg;
         }
+
+        //
+        // For tests only
+        //
+        public LinkedList<Message<T>> getMessageQueue()
+        {
+            return messageQueue;
+        } 
+
+        //
+        // For tests only
+        //
+        public LinkedList<bool> getReceivers()
+        {
+            return receivers;
+        } 
     }
 }
